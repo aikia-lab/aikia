@@ -1,0 +1,15 @@
+Package: aikia
+Title: Helper Functions for our Work at aikia
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Alex",
+           family = "Nickel",
+           role = c("aut", "cre"),
+           email = "alexander.nickel@mailbox.org")
+Description: Collection of functions that we use at aikia. We first start with the db connection function, but more functions will come shortly.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: DBI, pingr, RMariaDB
