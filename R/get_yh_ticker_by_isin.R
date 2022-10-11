@@ -9,6 +9,7 @@
 #' @return A tibble with several company & exchange info
 #'
 #' @export
+#' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
 #' get_yh_ticker_by_isin("DE0007100000", verbose = TRUE)
