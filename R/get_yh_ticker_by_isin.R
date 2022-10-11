@@ -31,6 +31,8 @@ get_yh_ticker_by_isin <- function (q = NULL, verbose = TRUE){
   if (verbose) {
     cat(crayon::green(paste0("returning ticker: ", plain$symbol,"\n")))
   }
+
+
   return(plain)
 }
 
