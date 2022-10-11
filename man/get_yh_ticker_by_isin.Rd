@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_yh_ticker_by_isin.R
 \name{get_yh_ticker_by_isin}
 \alias{get_yh_ticker_by_isin}
-\title{Title}
+\title{Match yahoo finance ticker by ISINs}
 \usage{
 get_yh_ticker_by_isin(q = NULL, verbose = TRUE)
 }
@@ -15,7 +15,7 @@ get_yh_ticker_by_isin(q = NULL, verbose = TRUE)
 A tibble with several company & exchange info
 }
 \description{
-Title
+Match yahoo finance ticker by ISINs
 }
 \examples{
 \dontrun{

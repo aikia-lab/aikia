@@ -1,12 +1,13 @@
 
 
 
-#' Title
+#' Match yahoo finance ticker by ISINs
 #'
 #' @param q ISIN to request for yahoo ticker
 #' @param verbose if\code{TRUE} provides instant feedback
 #'
 #' @return A tibble with several company & exchange info
+#'
 #' @export
 #'
 #' @examples \dontrun{
