@@ -19,7 +19,7 @@
 get_yh_ticker_by_isin <- function (q = NULL, verbose = TRUE){
 
   if(length(q)>1 | is.null(q)){
-    stop(crayon::red("Please provide 1 ISIN"))
+    stop(crayon::red("Please provide 1 ISIN \n"))
   }
 
   url <- glue::glue("https://query2.finance.yahoo.com/v1/finance/search?q={q}&newsCount=0")
@@ -29,7 +29,7 @@ get_yh_ticker_by_isin <- function (q = NULL, verbose = TRUE){
   plain$isin <- q
 
   if (verbose) {
-    cat(crayon::green(paste0("returning ticker: ", plain$symbol)))
+    cat(crayon::green(paste0("returning ticker: ", plain$symbol,"\n")))
   }
   return(plain)
 }
