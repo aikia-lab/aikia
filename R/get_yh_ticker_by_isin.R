@@ -15,7 +15,6 @@
 #' get_yh_ticker_by_isin("DE0007100000", verbose = TRUE)
 #' }
 #'
-
 get_yh_ticker_by_isin <- function (q = NULL, verbose = TRUE){
 
   if(length(q)>1 | is.null(q)){
@@ -28,6 +27,18 @@ get_yh_ticker_by_isin <- function (q = NULL, verbose = TRUE){
 
   plain$isin <- q
 
+  # inn case multiple tickers are available for same ISIN
+  if(nrow(plain)>1){
+    if (verbose){
+      cat(crayon::yellow(paste0("multiple tickers for: ", q,"\n")))
+      print(plain)
+    }
+
+    plain$rowsum <- rowSums(is.na(plain))
+    plain <- plain %>% dplyr::filter(rowsum == min(rowsum)) %>% dplyr::select(-rowsum)
+  }
+
+
   if (verbose) {
     cat(crayon::green(paste0("returning ticker: ", plain$symbol,"\n")))
   }
@@ -35,4 +46,10 @@ get_yh_ticker_by_isin <- function (q = NULL, verbose = TRUE){
 
   return(plain)
 }
+
+
+
+
+
+
 
