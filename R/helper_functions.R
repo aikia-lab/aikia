@@ -59,6 +59,25 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
                   date == max(date)) %>%
     dplyr::pull(date)
 
+
+  # error handling if max(date return empty data frame)
+  if(length(date_max)==0){
+    if(verbose){cat(paste0(crayon::red("No max date. Empty return for ticker ", ticker_tic,"\n")))}
+    idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
+                                  date = required_date,
+                                  vola_d = 0,
+                                  vola_w = 0,
+                                  vola_avg_20 = 0,
+                                  dtd_return = 0,
+                                  wtd_return = 0,
+                                  qtd_return = 0,
+                                  ytd_return = 0,
+                                  retrieval_time = lubridate::now())
+
+
+    return(idx_returns)
+  }
+
   ts <- data %>%
     dplyr::filter(ticker_yh ==  ticker_tic) %>%
     dplyr::select(date, close) %>%
@@ -66,11 +85,39 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
 
   # error handling if time line not long enough
   #  if(nrow(ts) > 84 & date_max == required_date){ # only ticker histories > 80d are valid otherwise 0 is stored (12 weekly figures for vola_w)
-  if(nrow(ts)<20){
-    stop(crayon::red("price history with "),crayon::yellow(nrow(ts)),crayon::red(" dates for "),crayon::yellow(ticker_tic),crayon::red(" not long enough! PLease check\n"))
+  if(nrow(ts)<84){
+    cat(crayon::red("price history with "),crayon::yellow(nrow(ts)),crayon::red(" dates for "),crayon::yellow(ticker_tic),crayon::red(" not long enough! PLease check\n"))
+
+    idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
+                                  date = required_date,
+                                  vola_d = 0,
+                                  vola_w = 0,
+                                  vola_avg_20 = 0,
+                                  dtd_return = 0,
+                                  wtd_return = 0,
+                                  qtd_return = 0,
+                                  ytd_return = 0,
+                                  retrieval_time = lubridate::now())
+
+
+    return(idx_returns)
+
   }
   if(date_max != required_date){
-    stop(crayon::red("max available date for "),crayon::yellow(ticker_tic), crayon::red(" does not match required date! PLease check\n"))
+    cat(crayon::red("max available date for "),crayon::yellow(ticker_tic), crayon::red(" does not match required date! PLease check\n"))
+    idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
+                                  date = required_date,
+                                  vola_d = 0,
+                                  vola_w = 0,
+                                  vola_avg_20 = 0,
+                                  dtd_return = 0,
+                                  wtd_return = 0,
+                                  qtd_return = 0,
+                                  ytd_return = 0,
+                                  retrieval_time = lubridate::now())
+
+
+    return(idx_returns)
   }
 
   d_return <- quantmod::periodReturn(ts, period = "daily") %>%
@@ -142,7 +189,8 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
                                 dtd_return = single_d$daily.returns,
                                 wtd_return = single_w$weekly.returns,
                                 qtd_return = qtd_return$quarterly.returns,
-                                ytd_return = ytd_return$yearly.returns)
+                                ytd_return = ytd_return$yearly.returns,
+                                retrieval_time = lubridate::now())
 
   return(idx_returns)
 
