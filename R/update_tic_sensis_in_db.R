@@ -42,6 +42,7 @@ update_tic_sensis_in_db <- function(ticker_list = NULL, valuation_date = NULL,  
   tic_sql <- ticker_list %>%
     stringr::str_c(collapse = "','") # first and last ' willl be added in sql query !!
 
+  mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
 
   # Get ticker history out of Data Base
   tic_history <-  DBI::dbGetQuery(mydb, stringr::str_c("SELECT *
@@ -53,10 +54,11 @@ update_tic_sensis_in_db <- function(ticker_list = NULL, valuation_date = NULL,  
     dplyr::mutate(date = lubridate::as_date(date)) %>%
     dplyr::arrange(desc(date))
 
+  DBI::dbDisconnect(mydb)
 
   if(verbose){cat(crayon::blue("starting p&l vola calculation\n"))}
 
-  ticker_vola <- purrr::map_df(unique(ticker_list), ticker_vola_fun, data = tic_history, required_date = valuation_date, verbose = FALSE)
+  ticker_vola <- purrr::map_df(unique(ticker_list), ticker_vola_fun, data = tic_history, required_date = valuation_date, verbose = verbose)
 
    # connect to db
   mydb <- aikia::connect_to_db(user="ceilert",password = "ceilert")
