@@ -16,9 +16,9 @@ update_tic_sensis_in_db(
 
 \item{valuation_date}{A Date to calculate Volas & Returns for}
 
-\item{check_duplicates}{if\code{TRUE} deletes duplicates in sensi table}
+\item{check_duplicates}{if \code{TRUE} deletes duplicates in sensi table}
 
-\item{verbose}{if\code{TRUE} provides instant feedback}
+\item{verbose}{if \code{TRUE} provides instant feedback}
 }
 \description{
 Update Ticker Sensis in DB

@@ -6,8 +6,8 @@
 #'
 #' @param ticker_list A list of ticker_yh symbol in DB
 #' @param valuation_date A Date to calculate Volas & Returns for
-#' @param check_duplicates if\code{TRUE} deletes duplicates in sensi table
-#' @param verbose if\code{TRUE} provides instant feedback
+#' @param check_duplicates if \code{TRUE} deletes duplicates in sensi table
+#' @param verbose if \code{TRUE} provides instant feedback
 #'
 #' @return
 #' @export
