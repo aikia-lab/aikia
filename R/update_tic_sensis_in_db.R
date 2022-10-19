@@ -26,12 +26,16 @@ update_tic_sensis_in_db <- function(ticker_list = NULL, valuation_date = NULL,  
 
 
   # set valuation date
-  if(is.null(valuation_date)|valuation_date >= lubridate::today()){
-
+  if(is.null(valuation_date)){
     if(verbose){cat(crayon::yellow(paste0("valation date is set to ", aikia::val_date(),"\n")))}
-
     valuation_date <- aikia::val_date()
   }
+
+  if(lubridate::as_date(valuation_date) >= lubridate::today()){
+    if(verbose){cat(crayon::yellow(paste0("valation date is set to ", aikia::val_date(),"\n")))}
+    valuation_date <- aikia::val_date()
+  }
+
 
   end_date <- aikia::val_date(offset = -400)
 
