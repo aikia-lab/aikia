@@ -2,7 +2,7 @@
 
 
 
-#' Update Ticker Sensis history in DB
+#' Update Ticker Sensis of different returns and volas history in DB
 #'
 #' @param ticker_list A list of ticker_yh symbol in DB
 #' @param check_duplicates if \code{TRUE} deletes duplicates in sensi table
@@ -18,7 +18,7 @@
 #' @examples\dontrun{
 #' update_tic_sensis_in_db(ticker_list = c("AAPL","AMZN"),valuation_date = aikia::val_date(), backwards = 10)
 #' }
-update_tic_sensis_in_db <- function(ticker_list = NULL, start_date = FALSE, check_duplicates = TRUE, verbose = FALSE, backwards=0){
+update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FALSE, check_duplicates = TRUE, verbose = FALSE, backwards=0){
 
 
   #load calendar
