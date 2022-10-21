@@ -84,8 +84,8 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
     timetk::tk_xts(close, date_var = date)
 
   # error handling if time line not long enough
-  #  if(nrow(ts) > 84 & date_max == required_date){ # only ticker histories > 80d are valid otherwise 0 is stored (12 weekly figures for vola_w)
-  if(nrow(ts)<84){
+  #  if(nrow(ts) > 60 & date_max == required_date){ # only ticker histories > 80d are valid otherwise 0 is stored (12 weekly figures for vola_w)
+  if(nrow(ts)<60){
     cat(crayon::red("price history with "),crayon::yellow(nrow(ts)),crayon::red(" dates for "),crayon::yellow(ticker_tic),crayon::red(" not long enough! PLease check\n"))
 
     idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
