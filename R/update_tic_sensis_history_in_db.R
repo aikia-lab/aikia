@@ -21,7 +21,12 @@
 update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FALSE, check_duplicates = TRUE, verbose = FALSE, backwards=0){
 
 
-  #load calendar
+  success_cat <- crayon::bold $ green
+  info_cat <- crayon::cyan $ bold
+  warning_cat <- crayon::yellow $ bold
+  red_cat <- crayon::red $ bold
+
+    #load calendar
   suppressMessages(bizdays::load_quantlib_calendars(ql_calendars = "UnitedStates/NYSE",
                                                     from= lubridate::as_date('2010-01-01'),
                                                     to=lubridate::today(),
@@ -30,18 +35,18 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
 
   # set valuation date
   if(is.null(start_date)){
-    if(verbose){cat(crayon::yellow(paste0("valation date is set to ", aikia::val_date(),"\n")))}
     start_date <- aikia::val_date()
+    if(verbose){cat(warning_cat(paste0("valation date is set to ", aikia::val_date(),"\n")))}
   }
 
   if(lubridate::as_date(start_date) >= lubridate::today()){
-    if(verbose){cat(crayon::yellow(paste0("valation date is set to ", aikia::val_date(),"\n")))}
+    if(verbose){cat(warning_cat(paste0("valation date is set to ", aikia::val_date(),"\n")))}
     start_date <- aikia::val_date()
   }
 
   # Check for correct ticker list
   if(is.null(ticker_list) | any(stringi::stri_count(ticker_list,regex="\\S+") > 1)){
-    stop(crayon::red("please provide ticker_yh for sensi calculation\n"))
+    stop(red_cat("please provide ticker_yh for sensi calculation\n"))
   }
 
   for(i in 0:backwards){
@@ -54,7 +59,7 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
 
     displ_date <- as.character(valuation_date)
 
-    if(verbose){cat(i,crayon::blue(" calculating sensis for date "),displ_date,"\n")}
+    if(verbose){cat(i,info_cat(" calculating sensis for date "),displ_date,"\n")}
 
     tic_sql <- ticker_list %>%
       stringr::str_c(collapse = "','") # first and last ' willl be added in sql query !!
@@ -73,7 +78,7 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
 
     DBI::dbDisconnect(mydb)
 
-    if(verbose){cat(crayon::blue("starting p&l vola calculation\n"))}
+    if(verbose){cat(info_cat("starting p&l vola calculation\n"))}
 
     ticker_vola <- purrr::map_df(unique(ticker_list), ticker_vola_fun, data = tic_history, required_date = valuation_date, verbose = verbose)
 
@@ -93,7 +98,7 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
   # Check for duplicates
   if(check_duplicates==TRUE){
 
-    if(verbose){cat(crayon::blue("deleting all duplicates in 'fin_ticker_sensi_history'\n"))}
+    if(verbose){cat(info_cat("deleting all duplicates in 'fin_ticker_sensi_history'\n"))}
 
     mydb <- aikia::connect_to_db(user="ceilert",password = "ceilert")
 

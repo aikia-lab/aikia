@@ -4,7 +4,7 @@
 get_yh_financials_hf <- function (symbol = NULL, period = 'annual', verbose = FALSE){
 
   if(verbose == TRUE){
-    cat(crayon::blue("retrieving data for ",symbol,"\n"))
+    cat(info_cat("retrieving data for ",symbol,"\n"))
   }
 
   if(period == "annual"){
@@ -19,7 +19,7 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', verbose = FA
              error=function(e) e)
 
   if(inherits(res, 'error')){
-    stop(crayon::red(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    stop(red_cat(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
   }
 
   flat <- lapply(res, function(x) {
@@ -49,10 +49,10 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', verbose = FA
 ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FALSE){
 
   if(is.null(required_date)|required_date >= lubridate::today()){
-    stop(crayon::red("wrong date provided. Please check!\n"))
+    stop(red_cat("wrong date provided. Please check!\n"))
   }
 
-  if(verbose){cat(paste0(crayon::blue("starting calculation of ticker ", ticker_tic,"\n")))}
+  if(verbose){cat(info_cat("starting calculation of ticker ", ticker_tic,"\n"))}
 
   date_max <- data %>%
     dplyr::filter(ticker_yh == ticker_tic,
@@ -62,7 +62,7 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
 
   # error handling if max(date return empty data frame)
   if(length(date_max)==0){
-    if(verbose){cat(paste0(crayon::red("No max date. Empty return for ticker ", ticker_tic,"\n")))}
+    if(verbose){cat(red_cat("No max date. Empty return for ticker ", ticker_tic,"\n"))}
     idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
                                   date = required_date,
                                   vola_d = 0,
@@ -86,7 +86,7 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
   # error handling if time line not long enough
   #  if(nrow(ts) > 60 & date_max == required_date){ # only ticker histories > 80d are valid otherwise 0 is stored (12 weekly figures for vola_w)
   if(nrow(ts)<60){
-    cat(crayon::red("price history with "),crayon::yellow(nrow(ts)),crayon::red(" dates for "),crayon::yellow(ticker_tic),crayon::red(" not long enough! PLease check\n"))
+    cat(red_cat("price history with "),warning_cat(nrow(ts)),red_cat(" dates for "),warning_cat(ticker_tic),red_cat(" not long enough! PLease check\n"))
 
     idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
                                   date = required_date,
@@ -104,7 +104,7 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
 
   }
   if(date_max != required_date){
-    cat(crayon::red("max available date for "),crayon::yellow(ticker_tic), crayon::red(" does not match required date! PLease check\n"))
+    cat(red_cat("max available date for "),warning_cat(ticker_tic), red_cat(" does not match required date! PLease check\n"))
     idx_returns <- tibble::tibble(ticker_yh = ticker_tic,
                                   date = required_date,
                                   vola_d = 0,
