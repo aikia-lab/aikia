@@ -2,7 +2,7 @@
 
 
 
-#' Historic Value at Risk
+#' Historical Value at Risk
 #'
 #' @param name a vector of yahoo tickers
 #' @param weights weights for each stock
@@ -19,7 +19,7 @@
 #' @examples\dontrun{
 #' hist_Value_at_Risk(name = c("AAPL","F"),weights = c(0.5,0.5))
 #' }
-hist_Value_at_Risk <- function(name = c('AAPL','F'),
+historical_VaR <- function(name = c('AAPL','F'),
                                weights = c(0.5,0.5),
                                start_date = lubridate::today()-365.25*3.5,
                                end_date = lubridate::today()-1,
