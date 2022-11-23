@@ -1,10 +1,13 @@
 
 
 
-get_yh_financials_hf <- function (symbol = NULL, period = 'annual', verbose = FALSE){
+get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_long = FALSE, verbose = FALSE){
+
+  script_logger <- crayon::bold $ bold
+  error_logger <- crayon::magenta $ bold
 
   if(verbose == TRUE){
-    cat(info_cat("retrieving data for ",symbol,"\n"))
+    cat(script_logger("retrieving data for ",symbol,"\n"))
   }
 
   if(period == "annual"){
@@ -19,26 +22,47 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', verbose = FA
              error=function(e) e)
 
   if(inherits(res, 'error')){
-    stop(red_cat(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    return()
   }
 
-  flat <- lapply(res, function(x) {
-    x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
-  })
+  flat <- tryCatch(lapply(res, function(x) {
+      x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
+    }), error=function(e) e)
+
+  if(inherits(flat, 'error')){
+    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    return()
+  }
 
   df <- suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
-    dplyr::select(-dplyr::contains(".fmt"), -dplyr::contains(".longFmt")) %>%
-    dplyr::mutate(endDate.raw = lubridate::as_date(.data$endDate.raw))
+    dplyr::mutate(endDate.raw = lubridate::as_datetime(.data$endDate.raw)) %>%
+    dplyr::select(dplyr::contains(".raw"))
 
   colnames(df) <- gsub(".raw", "", colnames(df))
+
   if ("capitalExpenditures" %in% names(df)) {
     df <- df %>% dplyr::mutate(freeCashflow = .data$totalCashFromOperatingActivities +
-                                 .data$capitalExpenditures)
-  }
-  else {
+                                  .data$capitalExpenditures)
+  } else if("totalCashFromOperatingActivities" %in% names(df)){
     df <- df %>% dplyr::mutate(freeCashflow = .data$totalCashFromOperatingActivities)
+  } else {
+    df <- df %>% dplyr::mutate(freeCashflow = NA)
   }
-  df$symbol <- symbol
+
+
+  if(as_pivot_long == TRUE){
+    df <- df %>%
+      dplyr::arrange(desc(endDate)) %>%
+      tidyr::pivot_longer(-1,names_to = "position", values_to = "values") %>%
+      tidyr::pivot_wider(names_from = endDate,values_from = values) %>%
+      dplyr::mutate(symbol = symbol) %>%
+      dplyr::relocate(symbol,.before = "position")
+  } else {
+    df <- df %>% dplyr::mutate(symbol = symbol) %>%
+      dplyr::relocate(symbol,.before = "endDate")
+  }
+
   return(dplyr::as_tibble(df))
 }
 
@@ -47,6 +71,11 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', verbose = FA
 
 
 ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FALSE){
+
+  success_cat <- crayon::bold $ green
+  info_cat <- crayon::cyan $ bold
+  warning_cat <- crayon::yellow $ bold
+  red_cat <- crayon::red $ bold
 
   if(is.null(required_date)|required_date >= lubridate::today()){
     stop(red_cat("wrong date provided. Please check!\n"))

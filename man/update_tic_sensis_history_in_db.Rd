@@ -17,7 +17,7 @@ update_tic_sensis_history_in_db(
 
 \item{start_date}{a 1st valuation date}
 
-\item{check_duplicates}{if \code{TRUE} deletes duplicates in sensi table}
+\item{check_duplicates}{if c deletes duplicates in sensi table}
 
 \item{verbose}{if \code{TRUE} provides instant feedback}
 

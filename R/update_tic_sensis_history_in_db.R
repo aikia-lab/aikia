@@ -5,7 +5,7 @@
 #' Update Ticker Sensis of different returns and volas history in DB
 #'
 #' @param ticker_list A list of ticker_yh symbol in DB
-#' @param check_duplicates if \code{TRUE} deletes duplicates in sensi table
+#' @param check_duplicates if c deletes duplicates in sensi table
 #' @param verbose if \code{TRUE} provides instant feedback
 #' @param start_date a 1st valuation date
 #' @param backwards number of days to calculate history geginning from start date

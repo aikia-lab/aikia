@@ -5,10 +5,10 @@
 #' @param stock a bloomberg ticker
 #' @param start a start date
 #' @param end an end date
-#' @param check_max_date_end checks the maximum available date in DB nd resets "END"
-#' @param check_min_date_end checks the minimum available date in DB and resets "END"
-#' @param check_min_date_start checks the minimum available date in DB and resets "START"
-#' @param check_max_date_start checks the maximum available date in DB and resets "START"
+#' @param check_max_date_end \code{TRUE} checks the maximum available date in DB nd resets "END"
+#' @param check_min_date_end \code{TRUE} checks the minimum available date in DB and resets "END"
+#' @param check_min_date_start \code{TRUE} checks the minimum available date in DB and resets "START"
+#' @param check_max_date_start \code{TRUE} checks the maximum available date in DB and resets "START"
 #' @param change_ticker switch ticker from bloomberg to yahoo (needs to be in meta data)
 #'
 #' @return a tibble
@@ -19,7 +19,7 @@
 #' @examples\dontrun{
 #' get_stock_hist_data_bb("AAPL UW", start = "2022-01-01", end = aikia::val_date())
 #' }
-get_stock_hist_data_bb <- function(stock, start = NULL, end = aikia::val_date(),
+get_bb_stock_hist_data <- function(stock, start = NULL, end = aikia::val_date(),
                           check_max_date_end = FALSE,
                           check_min_date_end = FALSE,
                           check_min_date_start = FALSE,
@@ -130,17 +130,22 @@ get_stock_hist_data_bb <- function(stock, start = NULL, end = aikia::val_date(),
   cat(crayon::blue(stringr::str_c("Start Date is ",start ," and end Date is ", end,"\n")))
 
 
-  history <- Rblpapi::bdh(paste(stock," Equity"),c("PX_OPEN", "PX_HIGH", "PX_LOW", "PX_LAST", "PX_VOLUME"),
+  bbcon <- Rblpapi::blpConnect()
+
+  history <- Rblpapi::bdh(paste0(stock," Equity"),c("PX_OPEN", "PX_HIGH", "PX_LOW", "PX_LAST", "PX_VOLUME"),
                           start.date = lubridate::as_date(start),
-                          end.date = lubridate::as_date(end)) %>%
+                          end.date = lubridate::as_date(end),
+                          int.as.double=TRUE) %>%
     tibble::as_tibble() %>%
-    dplyr::mutate(ticker_bb = .data$stock,
+    dplyr::mutate(ticker_bb = stock,
                   adjusted = .data$PX_LAST) %>%
     dplyr::rename(open = .data$PX_OPEN,
                   high = .data$PX_HIGH,
                   low = .data$PX_LOW,
                   close = .data$PX_LAST,
                   volume = .data$PX_VOLUME)
+
+  Rblpapi::blpDisconnect(bbcon)
 
   if(change_ticker == TRUE){
 
@@ -156,9 +161,11 @@ get_stock_hist_data_bb <- function(stock, start = NULL, end = aikia::val_date(),
     if(length(ticker)==0|is.na(ticker)){
       cat(crayon::red(paste0("no ticker match for ", stock,"\n")))
       return() # return empty data frame
+    } else {
+      cat(crayon::blue("yahoo ticker matched to:",ticker,"\n"))
     }
 
-    history <- history %>% dplyr::mutate(ticker_yh = .data$ticker) %>%
+    history <- history %>% dplyr::mutate(ticker_yh = ticker) %>%
       dplyr::select(-ticker_bb)
 
   }

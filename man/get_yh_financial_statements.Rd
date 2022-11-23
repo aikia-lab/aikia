@@ -7,6 +7,7 @@
 get_yh_financial_statements(
   symbols = NULL,
   period = "quarterly",
+  as_pivot_long = FALSE,
   verbose = FALSE
 )
 }
@@ -15,7 +16,9 @@ get_yh_financial_statements(
 
 \item{period}{Income statement: Either annual or quarterly}
 
-\item{verbose}{if\code{TRUE} provides instant feedback}
+\item{as_pivot_long}{if \code{TRUE} returns result as pivot long}
+
+\item{verbose}{if \code{TRUE} provides instant feedback}
 }
 \value{
 a tibble with corporate financials
