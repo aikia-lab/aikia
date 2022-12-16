@@ -17,12 +17,21 @@ get_short_static <- function(isin) {
 get_short_static("DE000DL40SR8")
 
 
+encode_url <- function (url, params) {
+    url_base <- paste0("https://api.boerse-frankfurt.de/v1/data/", url)
+    full_url <- paste0(url_base, "?", paste0(names(params), "=", params, 
+        collapse = "&"))
+    return(full_url)
+}
+
+
 # Helper Function for correct request headers
 get_ids  <- function(url) {
     
-    # I don't know what this is but it works
+    # Static from the API
     salt <- "w4ivc1ATTGta6njAZzMbkL3kJwxMfEAKDa3MNr"
 
+    timestamp <- lubridate::now()
     # Timestamps for encrypted headers
     milliseconds <- options(digits.secs = 5)
     timelocal <- strftime(lubridate::now(), "%Y-%m-%d %H:%M:%OS", tz ="UTC")
@@ -68,13 +77,24 @@ create_headers <- function(url) {
     return(headers)
 }
 
+# Gets the Data per curl GET.
+# Does this work with post? It may not
+get_data <- function(url) {
+    
+    response <- httr::GET(
+        url,
+        httr::add_headers(.headers = create_headers(url))
+    )
+
+    return(response)
+}
 
 
 url <- 'https://api.boerse-frankfurt.de/v1/search/bond_search'
 
 # This function delivers bond data for *ALL* available bonds at once. 
 # Set limit with n_bonds and use above URL
-bond_search <- function(url, n_bonds) {
+bond_search <- function(url, n_bonds = 25) {
     # Body for POST request
     data <- stringr::str_c('{"lang":"de","offset":0,"limit":', n_bonds, ',"sorting":"TURNOVER","sortOrder":"DESC"}')
 
@@ -100,44 +120,72 @@ bond_search <- function(url, n_bonds) {
 
 results <- bond_search(url, n_bonds = 20000)
 
-
-
-
-
-
-
-
-# IN DEVELOPMENT
-
-get_short_static <- function(isin, 
+# WORKS :)
+# This gets historical prices (at least back to year 2000)
+get_price_history <- function(isin, 
+                            limit = 50,
                             mic = "XFRA",
-                            min_date = lubridate::today()-1,
-                            max_date = lubridate::today()) {
+                            min_date = lubridate::today()-lubridate::days(51),
+                            max_date = lubridate::today()-1) {
     
-    url_base <- "https://api.boerse-frankfurt.de/v1/data/price_history"
-
-        date_delta <- max_date - min_date
-        params <- list(
+    date_delta <- max_date - min_date
+    params <- list(
+            "limit" = limit,
+            `offset` = '0',
             "isin" = isin,
             "mic" = mic,
             "minDate" = format(min_date, "%Y-%m-%d"),
             "maxDate" = format(max_date, "%Y-%m-%d"),
-            "limit" = as.integer(date_delta),
-            "cleanSplit" = FALSE,
-            "cleanPayout" = FALSE,
-            "cleanSubscription" = FALSE
+            "cleanSplit" = "false",
+            "cleanPayout" = "false",
+            "cleanSubscriptionRights" = "false"
             )
 
-    response <- httr::GET(url_base, query = params)
+    response <- get_data(encode_url("price_history", params))
 
-    content <- httr::content(response, as = "parsed")
+    parsed_response <- tibble::tibble(jsonlite::fromJSON(rawToChar(response$content))$data)
+    parsed_response$date  <- lubridate::as_date(parsed_response$date)
 
-    tibble::enframe(unlist(content)) |>
-        tidyr::pivot_wider(
-            names_from = name,
-            values_from = value
-        )
+    return(parsed_response)
 }
+
+db <- get_price_history(isin = "DE0005140008")
+
+
+get_instrument_statics <- function(isin) {
+    params <- list("isin" = isin)
+
+    response <- get_data(encode_url("instrument_information", params))
+
+    tibble::enframe(unlist(jsonlite::fromJSON(rawToChar(response$content))))
+}
+
+get_company_information <- function(isin) {
+    
+    params <- list("isin" = isin)
+
+    response <- get_data(encode_url("corporate_information", params))
+
+    tibble::enframe(unlist(jsonlite::fromJSON(rawToChar(response$content))))
+}
+
+db_info <- get_company_information(isin = "DE0005140008")
+
+get_related_indices <- function(isin) {
+    params <- list("isin" = isin)
+
+    response <- get_data(encode_url("related_indices", params))
+
+    tibble::tibble(jsonlite::fromJSON(rawToChar(response$content))$data)
+}
+
+db_indices <- get_related_indices(isin = "DE0005140008")
+
+# TODO
+# Equity Summary like bond
+# Single Security breakdown
+
+
 
 
 
