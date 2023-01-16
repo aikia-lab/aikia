@@ -68,6 +68,70 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 
 
 
+get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose = FALSE){
+
+  script_logger <- crayon::bold $ bold
+  warning_logger <- crayon::yellow $ bold
+  error_logger <- crayon::magenta $ bold
+
+  if(verbose){
+    cat(script_logger("retrieving data for ",symbol,"\n"))
+  }
+
+
+  # compose the request
+  url <- glue::glue("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true")
+
+  res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
+                  error=function(e) e)
+
+  if(inherits(res, 'error')){
+    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    return()
+  }
+
+  flat <- tryCatch(lapply(res, function(x) {
+    x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
+  }), error=function(e) e)
+
+  if(inherits(flat, 'error')){
+    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    return()
+  }
+
+  df <- suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
+    dplyr::mutate(endDate = lubridate::as_datetime(.data$endDate)) %>%
+    dplyr::select(growth_period = period,endDate,dplyr::contains(".raw")) %>%
+    dplyr::relocate('growth.raw',.after = 'growth_period') %>%
+    janitor::clean_names()
+
+  df <- cbind(df,est_period = c("actual_qtr","next_qtr","actual_year","next_year",NA,NA)) %>%
+    dplyr::relocate('est_period',.after = 'end_date')
+  colnames(df) <- gsub("_raw", "", colnames(df))
+
+
+  if(as_pivot_long){
+
+    if(verbose){
+      cat(warning_logger("Pivot long requires to exclude >growth< estimation!\n"))
+    }
+
+    df <- df %>%
+      dplyr::arrange(desc(end_date)) %>%
+      dplyr::select(-growth_period,-growth,-end_date) %>%
+      tidyr::drop_na(est_period) %>%
+      tidyr::pivot_longer(-est_period,names_to = "position", values_to = "values") %>%
+      tidyr::pivot_wider(names_from = est_period,values_from = values) %>%
+      dplyr::mutate(ticker_yh = symbol) %>%
+      dplyr::relocate(ticker_yh,.before = "position")
+  } else {
+    df <- df %>% dplyr::mutate(ticker_yh = symbol) %>%
+      dplyr::relocate(ticker_yh,.before = "end_date")
+  }
+
+  return(dplyr::as_tibble(df))
+}
+
 
 
 ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FALSE){
