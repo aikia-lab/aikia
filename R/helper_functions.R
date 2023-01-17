@@ -1,5 +1,7 @@
 
 
+# Liste an allen modules
+# https://github.com/pilwon/node-yahoo-finance/issues/52
 
 get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_long = FALSE, verbose = FALSE){
 
@@ -99,11 +101,16 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
     return()
   }
 
-  df <- suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
+  df <- tryCatch(suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
     dplyr::mutate(endDate = lubridate::as_datetime(.data$endDate)) %>%
     dplyr::select(growth_period = period,endDate,dplyr::contains(".raw")) %>%
     dplyr::relocate('growth.raw',.after = 'growth_period') %>%
-    janitor::clean_names()
+    janitor::clean_names(), error=function(e) e)
+
+  if(inherits(df, 'error')){
+    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    return()
+  }
 
   df <- cbind(df,est_period = c("actual_qtr","next_qtr","actual_year","next_year",NA,NA)) %>%
     dplyr::relocate('est_period',.after = 'end_date')
