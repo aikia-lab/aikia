@@ -30,7 +30,7 @@ theme_aikia <- function(
   ) %+replace% ggplot2::theme(
     plot.title = ggtext::element_markdown(
       colour = aikia_main(),
-      face = "bold",
+  #    face = "bold",
       size = base_size + 24,
       hjust = 0,
       vjust = 2,
@@ -38,7 +38,7 @@ theme_aikia <- function(
     ),
     plot.subtitle = ggtext::element_markdown(
       colour = aikia_main_light(),
-      face = "bold",
+  #    face = "bold",
       size = base_size + 9,
       hjust = 0,
       vjust = 2,
