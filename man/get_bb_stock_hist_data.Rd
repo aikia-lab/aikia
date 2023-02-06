@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_bb_stock_hist_data.R
 \name{get_bb_stock_hist_data}
 \alias{get_bb_stock_hist_data}
-\title{Update ticker history from Bloomberg to fill up DB data}
+\title{Update ticker history from Bloomberg}
 \usage{
 get_bb_stock_hist_data(
   stock,
@@ -36,7 +36,7 @@ get_bb_stock_hist_data(
 a tibble
 }
 \description{
-Update ticker history from Bloomberg to fill up DB data
+Update ticker history from Bloomberg
 }
 \examples{
 \dontrun{

@@ -1,6 +1,6 @@
 
 
-#' Update ticker history from Bloomberg to fill up DB data
+#' Update ticker history from Bloomberg
 #'
 #' @param stock a bloomberg ticker
 #' @param start a start date

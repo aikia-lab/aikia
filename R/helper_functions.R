@@ -295,3 +295,30 @@ ticker_vola_fun <- function(ticker_tic, data, required_date = NULL, verbose = FA
   return(idx_returns)
 
 }
+
+
+
+get_yh_hist_hf <- function(symbol = NULL, verbose = FALSE){
+
+  script_logger <- crayon::bold $ bold
+  warning_logger <- crayon::yellow $ bold
+  error_logger <- crayon::magenta $ bold
+
+  if(verbose){
+    cat(script_logger("retrieving data for ",symbol,"\n"))
+  }
+
+
+  tic_hist <- glue::glue("https://finance.yahoo.com/quote/{symbol}/history?p={symbol}") %>%
+    rvest::read_html() %>%
+    rvest::html_table() %>%
+    .[[1]] %>%
+    janitor::clean_names() %>%
+    dplyr::filter(!stringr::str_detect(close,"Dividend|splits")) %>%
+    dplyr::mutate(ticker_yh = symbol) %>%
+    dplyr::as_tibble()
+
+
+  return(tic_hist)
+
+}
