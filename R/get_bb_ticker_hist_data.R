@@ -19,7 +19,7 @@
 #' @examples\dontrun{
 #' get_stock_hist_data_bb("AAPL UW", start = "2022-01-01", end = aikia::val_date())
 #' }
-get_bb_stock_hist_data <- function(stock, start = NULL, end = aikia::val_date(),
+get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date(),
                           check_max_date_end = FALSE,
                           check_min_date_end = FALSE,
                           check_min_date_start = FALSE,

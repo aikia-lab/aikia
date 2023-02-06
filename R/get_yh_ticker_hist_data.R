@@ -11,7 +11,7 @@
 #' get_yh_hist_data("AAPL")
 #' }
 #'
-get_yh_hist_data <- function(symbols = NULL, verbose = FALSE){
+get_yh_ticker_hist_data <- function(symbols = NULL, verbose = FALSE){
 
   if(is.null(symbols)){stop(crayon::red("No Symbol provided\n"))}
 
