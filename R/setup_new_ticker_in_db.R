@@ -116,11 +116,14 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
 
     cat(info_cat("Updating last 60 days of ticker's sensi history\n"))
 
+    if(start_history == aikia::val_date()){backward=1
+    } else {backward=60}
+
     # direct db update in function
-    aikia::update_tic_sensis_history_in_db(ticker_list = tic_isin$ticker_yh, start_date = aikia::val_date(), verbose = verbose, backwards=60)
+    aikia::update_tic_sensis_history_in_db(ticker_list = tic_isin$ticker_yh, start_date = aikia::val_date(), verbose = verbose, backwards=backward)
 
     cat(info_cat(stringr::str_c("All successfull...!\n")))
-    tictoc::toc(msg = "\nAll successfull...!\n")
+    tictoc::toc()
     }
 
 }
