@@ -98,7 +98,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
 
     cat(info_cat("Updating ticker history starting",as.character(start_history),"and save in db\n"))
 
-    new_hist <- aikia::get_bb_stock_hist_data(stock = ticker_bb, start = start_history, change_ticker = TRUE)
+    new_hist <- aikia::get_bb_ticker_hist_data(stock = ticker_bb, start = start_history, change_ticker = TRUE)
 
     con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
 
