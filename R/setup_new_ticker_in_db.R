@@ -17,11 +17,12 @@
 setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_history = aikia::val_date(), verbose = FALSE){
 
 
-  info_cat <- crayon::blue $ bold
+  info_cat <- crayon::cyan $ bold
   warning_cat <- crayon::yellow $ bold
   stop_cat <- crayon::red $ bold
+  success_cat <- crayon::green $ bold
 
-  cat(info_cat("Ensure an existing bloomberg connection\n"))
+  cat(info_cat("Ensure an existing bloomberg connection\n\n"))
 
   bbcon <- Rblpapi::blpConnect()
 
@@ -40,7 +41,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
 
   Rblpapi::blpDisconnect(bbcon)
 
-  cat(info_cat("retrieved all sector data for"),warning_cat(ticker_bb,"\n"),info_cat("Checking if ticker ISIN already exists in db!\n"))
+  cat(info_cat("retrieved all sector data for"),warning_cat(ticker_bb,"\n"),info_cat("Checking if ticker ISIN already exists in db!\n\n"))
 
 
   #Check if already exists in DB
@@ -79,7 +80,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
                       ticker_fv = stringr::word(ticker_bb,1))
     }
 
-    cat(info_cat("with yahoo ticker:",tic_isin$ticker_yh,"and finviz:",tic_isin$ticker_fv,"in meta data table\n"))
+    cat(info_cat(" with yahoo ticker:",tic_isin$ticker_yh,"\n and finviz:",tic_isin$ticker_fv,"in meta data table\n\n"))
 
     # update new tickers to db
     con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
@@ -114,7 +115,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
 
 # 3.Update Sensis --------------------------------------------------------
 
-    cat(info_cat("Updating last 60 days of ticker's sensi history\n"))
+    cat(info_cat("\nUpdating last 60 days of ticker's sensi history\n"))
 
     if(start_history == aikia::val_date()){backward=1
     } else {backward=60}
@@ -122,7 +123,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
     # direct db update in function
     aikia::update_tic_sensis_history_in_db(ticker_list = tic_isin$ticker_yh, start_date = aikia::val_date(), verbose = verbose, backwards=backward)
 
-    cat(info_cat(stringr::str_c("All successfull...!\n")))
+    cat(success_cat(stringr::str_c("\n\nAll successfull...!\n")))
     tictoc::toc()
     }
 
