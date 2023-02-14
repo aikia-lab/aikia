@@ -7,6 +7,7 @@
 setup_new_ticker_in_db(
   ticker_bb,
   provide_tic_yh = NULL,
+  provide_tic_fv = NULL,
   start_history = aikia::val_date(),
   verbose = FALSE
 )
@@ -15,6 +16,8 @@ setup_new_ticker_in_db(
 \item{ticker_bb}{a Bloomberg ticker}
 
 \item{provide_tic_yh}{set ticker yahoo or search by ISIN}
+
+\item{provide_tic_fv}{set ticker finviz for news scraping}
 
 \item{start_history}{start date of new ticker's price history}
 

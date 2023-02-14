@@ -4,17 +4,21 @@
 #'
 #' @param ticker_bb a Bloomberg ticker
 #' @param provide_tic_yh set ticker yahoo or search by ISIN
+#' @param provide_tic_fv set ticker finviz for news scraping
 #' @param verbose \code{TRUE} provides instand feedback
 #' @param start_history start date of new ticker's price history
 #'
+#'
 #' @return NULL. Saves directly to DB
 #' @export
+#'
+#' @importFrom magrittr %>%
 #'
 #' @examples\dontrun{
 #' setup_new_ticker_in_db("AAPL UW", provide_tic_yh = "AAPL")
 #' }
 #'
-setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_history = aikia::val_date(), verbose = FALSE){
+setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic_fv = NULL, start_history = aikia::val_date(), verbose = FALSE){
 
 
   info_cat <- crayon::cyan $ bold
@@ -68,19 +72,19 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
 
     cat(info_cat("setting up",tic_isin$ticker_bb,"in meta data table\n"))
     # if no yahoo ticker is provided one is search via BB ticker's isin
-    if(is.null(provide_tic_yh)){
-      tic_isin <- tic_isin %>%
-        dplyr::mutate(ticker_yh = aikia::get_yh_ticker_by_isin(isin,verbose = F)$symbol,
-                      ticker_fv = stringr::word(ticker_bb,1))
+#    if(is.null(provide_tic_yh) & is.null(provide_tic_fv)){
+#      tic_isin <- tic_isin %>%
+#        dplyr::mutate(ticker_yh = aikia::get_yh_ticker_by_isin(isin,verbose = F)$symbol,
+#                      ticker_fv = stringr::word(ticker_bb,1))
 
-    } else {
+#    } else {
       # if yahoo ticker is provided it is used directly
       tic_isin <- tic_isin %>%
-        dplyr::mutate(ticker_yh = aikia::get_yh_ticker_by_isin(isin,verbose = F)$symbol,
-                      ticker_fv = stringr::word(ticker_bb,1))
-    }
+        dplyr::mutate(ticker_yh = ifelse(!is.null(provide_tic_yh),as.character(provide_tic_yh), aikia::get_yh_ticker_by_isin(isin,verbose = F)$symbol),
+                      ticker_fv = ifelse(!is.null(provide_tic_fv),as.character(provide_tic_fv), stringr::word(ticker_bb,1)))
+ #   }
 
-    cat(info_cat(" with yahoo ticker:",tic_isin$ticker_yh,"\n and finviz:",tic_isin$ticker_fv,"in meta data table\n\n"))
+    cat(info_cat(" \ with yahoo ticker:",tic_isin$ticker_yh,"\n \ and finviz:",tic_isin$ticker_fv,"\nin meta data table\n\n"))
 
     # update new tickers to db
     con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
@@ -117,7 +121,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, start_histo
 
     cat(info_cat("\nUpdating last 60 days of ticker's sensi history\n"))
 
-    if(start_history == aikia::val_date()){backward=1
+    if(start_history == aikia::val_date()){backward=0
     } else {backward=60}
 
     # direct db update in function

@@ -28,7 +28,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
 
 
   ticker <- NULL
-  cat(crayon::blue(stringr::str_c("Start Ticker ",stock, "\n")))
+  cat(crayon::cyan(stringr::str_c("Start Ticker ",stock, "\n")))
   if(is.null(start)){ stop("no starting date provided")}
 
   if(check_min_date_start == TRUE){ # checks the minimum available date in DB and resets "START"
@@ -127,7 +127,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
     DBI::dbDisconnect(mydb)
   }
 
-  cat(crayon::blue(stringr::str_c("Start Date is ",start ," and end Date is ", end,"\n")))
+  cat(crayon::cyan(stringr::str_c("Start Date is ",start ," and end Date is ", end,"\n")))
 
 
   bbcon <- Rblpapi::blpConnect()
@@ -162,7 +162,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
       cat(crayon::red(paste0("no ticker match for ", stock,"\n")))
       return() # return empty data frame
     } else {
-      cat(crayon::blue("yahoo ticker matched to:",ticker,"\n"))
+      cat(crayon::cyan("yahoo ticker matched to:",ticker,"\n"))
     }
 
     history <- history %>% dplyr::mutate(ticker_yh = ticker) %>%

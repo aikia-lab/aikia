@@ -16,6 +16,8 @@
 #' @return list of VaR, Time Series and VaR Plot
 #' @export
 #'
+#' @importFrom magrittr %>%
+#'
 #' @examples\dontrun{
 #' hist_Value_at_Risk(name = c("AAPL","F"),weights = c(0.5,0.5))
 #' }
@@ -30,7 +32,7 @@ historical_VaR <- function(name = c('AAPL','F'),
 
 
 # preprocessing constraints -----------------------------------------------
-  library(magrittr)
+
   success_cat <- crayon::bold $ green
   info_cat <- crayon::cyan $ bold
   warning_cat <- crayon::yellow $ bold
@@ -82,7 +84,7 @@ historical_VaR <- function(name = c('AAPL','F'),
     raw_data <- raw_data %>%
       dplyr::rename(name = symbol,
                     px_last = adjusted) %>%
-      dplyr::arrange(name,desc(date))
+      dplyr::arrange(name, dplyr::desc(date))
 
     if(max(raw_data$date)<end_date){
       cat(warning_cat("  Max received date", max(raw_data$date),"is not matching end date", end_date,"\n"))
