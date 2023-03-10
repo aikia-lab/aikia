@@ -1,5 +1,5 @@
 
-#' Rank Peers in General OR by Specific Ratio
+#' Ratio Rank of single Ticker
 #'
 #' @param ratio_rank_object result file of 'rank_peer_ratio' function
 #' @param ex_ticker Select a Yahoo ticker to list all Ratios
