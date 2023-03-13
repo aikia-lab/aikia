@@ -21,7 +21,7 @@ rank_report_ticker_ratio <- function(ratio_rank_object, ex_ticker = NULL){
 
   if(!'ratio_rank_object' %in% names(ratio_rank_object)){
     cat(error_logger("PLease check data frame! Not a 'Ratio Rank Object'\n"))
-    cat(error_logger("FIRST run "), warning_logger("rank_peer_ratio\n"))
+    cat(error_logger("FIRST run function"), warning_logger("aikia::rank_peer_ratio()\n"))
     return()
   }
   ticker_info <- ratio_rank_object %>%
@@ -33,7 +33,7 @@ rank_report_ticker_ratio <- function(ratio_rank_object, ex_ticker = NULL){
     dplyr::ungroup() %>%
     dplyr::filter(ticker_yh == ex_ticker) %>%
     dplyr::mutate(score = sum(assessment)) %>%
-    dplyr::select(calc_ratio,rank,level,`Level Range`,level_bar,groups,score,sector,name) %>%
+    dplyr::select(calc_ratio,rank,level,`Level Range`,level_bar,groups,score,sector,name,comment) %>%
     dplyr::group_by(groups)
 
   tic_gt <- ticker_info %>% gt::gt() %>%

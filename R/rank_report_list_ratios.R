@@ -20,7 +20,7 @@ rank_report_list_ratios <- function(ratio_rank_object = NULL){
 
   if(!'ratio_rank_object' %in% names(ratio_rank_object)){
     cat(error_logger("PLease check data frame! Not a 'Ratio Rank Object'\n"))
-    cat(error_logger("FIRST run "), warning_logger("rank_peer_ratio\n"))
+    cat(error_logger("FIRST run function"), warning_logger("aikia::rank_peer_ratio()\n"))
     return()
   }
 

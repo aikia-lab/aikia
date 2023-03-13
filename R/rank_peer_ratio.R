@@ -37,9 +37,9 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
 
   needed_ratios <- tibble::tribble(
     ~ratios, ~pref_direction,~groups, ~comment,
-    'trailingPE', 'lower','Valuations', "last 12 month Price Earnings Ratio",
-    'forwardPE',  'lower','Valuations',  "expected next 12 month Price Earnings Ratio",
-    'pegRatio',   'lower','Ratios', "Price Earnings to Growth Ratio (Relates the PE ratio of a company to its expected earnings growth.
+    'trailingPE', 'lower','Valuations', "last 12 month Price/Earnings Ratio",
+    'forwardPE',  'lower','Valuations',  "expected next 12 month Price/Earnings Ratio",
+    'pegRatio',   'lower','Ratios', "Price/Earnings to Growth Ratio (Relates the PE ratio of a company to its expected earnings growth.
                                               Particularly in the case of growth stocks, whose PE ratio tends to be higher and can therefore be
                                                perceived as overvalued, the PEG ratio offers the possibility of achieving more meaningful results.",
     'shortRatio', 'lower','Ratios',    "proportion of securities sold short divided by the average daily trading volume. The ratio can be used,
@@ -47,14 +47,13 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
     'quickRatio', 'higher','Ratios',   "ratio of the company's available financial assets plus shares and current receivables to current liabilities.",
     'currentRatio', 'higher','Ratios', "The current ratio is a liquidity ratio that measures whether a firm has enough resources to meet its short-term obligations.
                                                 It compares a firm's current assets to its current liabilities",
-    'earningsGrowth', 'higher','Growth', "NA",
-    'ebitdaMargins', 'higher','Margins', "NA",
-    'grossMargins', 'higher', 'Margins',"NA",
-    'operatingMargins', 'higher','Margins', "NA",
-    'profitMargins', 'higher','Margins', "NA",
-    #        'netIncomeToCommon', 'higher','Valuations', "NA",
-    'revenueGrowth', 'higher','Growth', "NA",
-    'returnOnAssets', 'higher','Valuations', "NA")
+    'earningsGrowth', 'higher','Growth', "Earnings growth rate is a key value that is needed when the Discounted cash flow model.",
+    'ebitdaMargins', 'higher','Margins', "The EBITDA margin is calculated by dividing EBITDA by revenue.",
+    'grossMargins', 'higher', 'Margins',"Gross margin measures a company's gross profit compared to its revenues as a percentage.",
+    'operatingMargins', 'higher','Margins', "The operating margin represents how efficiently a company is able to generate profit through its core operations.",
+    'profitMargins', 'higher','Margins', "Expressed as a percentage, profit margin indicates how many cents of profit has been generated for each dollar of sale.",
+    'revenueGrowth', 'higher','Growth', "revenue growth is an increase in a company's sales in one year to the previous year. For an accurate picture of growth, investors should look at the growth of several quarters and how consistent it is.",
+    'returnOnAssets', 'higher','Valuations', "indicates how profitable a company is in relation to its total assets by dividing its net income by its total assets.")
 
 
 
@@ -179,10 +178,10 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
   needed_ratios <- needed_ratios %>% tibble::add_row(
     ratios = c('magic_number_accounts','magic_number_capexpends','magic_number_research_devs'),
     pref_direction = c('higher','higher','higher'),
-    groups = c('SaaS','SaaS','SaaS'),
-    comment = c('(Umsatz der Periode MINUS Umsatz der Vorperiode) * 4 DIV accountsPayable',
-                '(Umsatz der Periode MINUS Umsatz der Vorperiode) * 4 DIV capitalExpenditures',
-                '(Umsatz der Periode MINUS Umsatz der Vorperiode) * 4 DIV researchDevelopment'))
+    groups = c('SaaS KPIs','SaaS KPIs','SaaS KPIs'),
+    comment = c('(revenue for the period MINUS revenue for the previous period) * 4 DIV accountsPayable',
+                '(revenue for the period MINUS revenue for the previous period) * 4 DIV capitalExpenditures',
+                '(revenue for the period MINUS revenue for the previous period) * 4 DIV researchDevelopment'))
 
   #tic_ratios[(tic_ratios$ticker_yh == "AAPL" & tic_ratios$date == max(tic_ratios$date)),"pegRatio"]$pegRatio
 

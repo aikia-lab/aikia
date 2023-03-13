@@ -2,7 +2,7 @@
 % Please edit documentation in R/rank_report_ticker_ratio.R
 \name{rank_report_ticker_ratio}
 \alias{rank_report_ticker_ratio}
-\title{Rank Peers in General OR by Specific Ratio}
+\title{Ratio Rank of single Ticker}
 \usage{
 rank_report_ticker_ratio(ratio_rank_object, ex_ticker = NULL)
 }
@@ -15,7 +15,7 @@ rank_report_ticker_ratio(ratio_rank_object, ex_ticker = NULL)
 gt object of Ticker Rank in all Ratios
 }
 \description{
-Rank Peers in General OR by Specific Ratio
+Ratio Rank of single Ticker
 }
 \examples{
 \dontrun{
