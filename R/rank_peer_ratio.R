@@ -80,10 +80,10 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
                                     WHERE ",industry_level_prio," = '",sector_prio,"'",
                                     sec_filter,
                                     region)) %>%
-    tidyr::drop_na(ticker_yh)
+    tidyr::drop_na(.data$ticker_yh)
 
   peer_sql <- peers %>%
-    dplyr::pull(ticker_yh) %>%
+    dplyr::pull(.data$ticker_yh) %>%
     stringr::str_c(.,collapse = "','")
 
   needed_ratios_sql <- stringr::str_c(needed_ratios$ratios,collapse = ",")
@@ -101,7 +101,7 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
                             AND date >= (SELECT DATE_SUB(CAST(MAX(regularMarketTime) as DATE), INTERVAL 1 DAY) as max_date
                                            FROM fin_ticker_market_snapshot)")) %>%
     dplyr::as_tibble() %>%
-    dplyr::select(-row_num)
+    dplyr::select(-.data$row_num)
 
 
 
@@ -128,9 +128,9 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
 
   # Add Revenue qtr1-qtr2
   tic_qtr_results <- tic_qtr_results_raw %>%
-    dplyr::group_by(ticker_yh) %>%
-    dplyr::arrange(ticker_yh,date) %>%
-    dplyr::mutate(revenue_diff = (totalRevenue-dplyr::lag(totalRevenue))*4) %>%
+    dplyr::group_by(.data$ticker_yh) %>%
+    dplyr::arrange(.data$ticker_yh,.data$date) %>%
+    dplyr::mutate(revenue_diff = (.data$totalRevenue-dplyr::lag(.data$totalRevenue))*4) %>%
     dplyr::ungroup() %>%
     dplyr::select(date,ticker_yh,accountsPayable,capitalExpenditures,researchDevelopment,revenue_diff)
 
@@ -147,7 +147,7 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
     needed_ratios <- needed_ratios %>% tibble::add_row(
       ratios = 'rule_40',
       pref_direction = 'higher',
-      groups = 'SaaS',
+      groups = 'SaaS KPIs',
       comment = 'a principle that states a software companys combined revenue growth rate and profit margin should equal or exceed 40%')
   }
 
