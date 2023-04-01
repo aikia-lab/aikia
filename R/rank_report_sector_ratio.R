@@ -53,9 +53,9 @@ rank_report_sector_ratio <- function(ratio_rank_object, ratio = NULL){
     single_rank <- ratio_rank_object %>%
       dplyr::filter(stringr::str_detect(calc_ratio,!!ratio)) %>%
       tidyr::drop_na(name) %>%
-      dplyr::mutate(level = ifelse(pref_direction == "lower",max(level)/level,level/max(level)),
+      dplyr::mutate(levels = level,
+                    level = ifelse(pref_direction == "lower",max(level)/level,level/max(level)),
                     level_max = max(level),
-                    levels = level,
                     direction_rank = as.numeric(stringr::str_remove(rank,"\\/[0-9]*"))) %>%
       dplyr::arrange(direction_rank) %>%
       dplyr::select(ticker_yh,name,levels,rank,level,level_max) %>%
