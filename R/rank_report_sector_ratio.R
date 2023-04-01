@@ -50,7 +50,7 @@ rank_report_sector_ratio <- function(ratio_rank_object, ratio = NULL){
     return(all_ranks)
   } else {
     # all ticker assessments by SECTOR
-    ratio_rank_object %>%
+    single_rank <- ratio_rank_object %>%
       dplyr::filter(stringr::str_detect(calc_ratio,!!ratio)) %>%
       tidyr::drop_na(name) %>%
       dplyr::mutate(level_max = max(level),
@@ -71,8 +71,10 @@ rank_report_sector_ratio <- function(ratio_rank_object, ratio = NULL){
         rank = "Rank",
         levels = "Level",
         level = "Level Range") %>%
-      gt::cols_align(align = "center") %>%v
+      gt::cols_align(align = "center") %>%
     aikia::gt_theme_aikia()
+
+    return(single_rank)
 
   }
 
