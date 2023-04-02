@@ -129,7 +129,11 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic
 
     cat(success_cat(stringr::str_c("\n\nAll successfull...!\n")))
     tictoc::toc()
-    }
+  }
+
+  DBI::dbDisconnect(con)
+  closeAllConnections()
+
 
 }
 
