@@ -84,7 +84,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic
                       ticker_fv = ifelse(!is.null(provide_tic_fv),as.character(provide_tic_fv), stringr::word(ticker_bb,1)))
  #   }
 
-    cat(info_cat(" \ with yahoo ticker:",tic_isin$ticker_yh,"\n \ and finviz:",tic_isin$ticker_fv,"\nin meta data table\n\n"))
+    cat(info_cat(" \ with yahoo ticker:"),warning_cat(tic_isin$ticker_yh),info_cat("\n \ and finviz:"),warning_cat(tic_isin$ticker_fv),info_cat("\nin meta data table\n\n"))
 
     # update new tickers to db
     con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
