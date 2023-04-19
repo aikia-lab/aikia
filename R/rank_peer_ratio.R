@@ -116,7 +116,7 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
                                             capitalExpenditures,
                                             researchDevelopment,
                                             ROW_NUMBER() OVER (PARTITION BY ticker_yh ORDER BY endDate DESC) AS row_num
-                                        FROM fin_ticker_qtr_results
+                                        FROM fin_ticker_qtr_results_yh
                                       ) AS t
                                       WHERE t.row_num <= 2
                                       AND ticker_yh IN ('",peer_sql,"')")) %>%
