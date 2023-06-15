@@ -4,8 +4,9 @@
 #'
 #' @param stock A yahoo ticker symbol
 #' @param set_pe Optionally set an own PE ratio
+#' @param as_gt if \code{FALSE} returns a tibble otherwise a gt table
 #'
-#' @return a gt table
+#' @return a tibble or gt table
 #' @export
 #'
 #' @importFrom magrittr %>%
@@ -14,7 +15,7 @@
 #' ticker_pe_px_indication("AAPL")
 #' }
 #'
-ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL){
+ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
 
 
   script_logger <- crayon::bold $ cyan
@@ -83,12 +84,16 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL){
                   `Price Indication (nxt yr)` = indic_px_nxt_yr,
                   `Price Difference (nxt yr)` = price_dif2) %>%
     tidyr::pivot_longer(c(-ticker_yh,-position),names_to = 'name',values_to = 'values') %>%
-    tidyr::pivot_wider(dplyr::everything(),names_from = "position",values_from = c("values")) %>%
-    dplyr::select(-ticker_yh)
+    tidyr::pivot_wider(dplyr::everything(),names_from = "position",values_from = c("values"))
 
+
+  if(as_gt == FALSE){
+    return(est)
+  }
 
   # Create base GT table
   gt_est <- est %>%
+    dplyr::select(-ticker_yh) %>%
     gt::gt() %>%
     gt::tab_header(title = gt::md(paste0("<font style='color:red;font-size:30px'> ",stock,"</font>"))) %>%
     gt::tab_spanner(label = "Estimation",

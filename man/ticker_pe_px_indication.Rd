@@ -4,15 +4,17 @@
 \alias{ticker_pe_px_indication}
 \title{A simple Ffuture Price Indication using the estimated eps and PE Ratio}
 \usage{
-ticker_pe_px_indication(stock = NULL, set_pe = NULL)
+ticker_pe_px_indication(stock = NULL, set_pe = NULL, as_gt = TRUE)
 }
 \arguments{
 \item{stock}{A yahoo ticker symbol}
 
 \item{set_pe}{Optionally set an own PE ratio}
+
+\item{as_gt}{if \code{FALSE} returns a tibble otherwise a gt table}
 }
 \value{
-a gt table
+a tibble or gt table
 }
 \description{
 A simple Ffuture Price Indication using the estimated eps and PE Ratio
