@@ -100,7 +100,7 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL){
     gt::tab_footnote(footnote = gt::md(stringr::str_c("Market Data retrieval as of ",vals$date)),
                      placement = "left")
 
-  gt_est <- fill_column(gt_est,c("eps_trend_current","eps_trend_30days_ago","eps_trend_60days_ago","eps_trend_90days_ago"))
+  gt_est <- fill_column(est,gt_est,c("eps_trend_current","eps_trend_30days_ago","eps_trend_60days_ago","eps_trend_90days_ago"))
 
   # add footnote
   if(!is.null(set_pe)){

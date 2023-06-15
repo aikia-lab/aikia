@@ -327,11 +327,11 @@ get_yh_hist_hf <- function(symbol = NULL, verbose = FALSE){
 
 
 # helper function for ticker_pe_px_indication function
-fill_column <- function(gtobj, columns){
+fill_column <- function(df,gtobj, columns){
 
   for(column in columns){
 
-    if(as.numeric(est[7,column]) < as.numeric(est[8,column])){
+    if(as.numeric(df[7,column]) < as.numeric(df[8,column])){
       gtobj <- gtobj %>%
         gt::tab_style(style = gt::cell_fill(color = aikia::aikia_palette_eight()[5],alpha = 0.5),
                       locations = gt::cells_body(columns = column, rows = 8))
@@ -341,7 +341,7 @@ fill_column <- function(gtobj, columns){
                       locations = gt::cells_body(columns = column, rows = 8))
     }
 
-    if(as.numeric(est[7,column]) < as.numeric(est[9,column])){
+    if(as.numeric(df[7,column]) < as.numeric(df[9,column])){
       gtobj <- gtobj %>%
         gt::tab_style(style = gt::cell_fill(color = aikia::aikia_palette_eight()[5],alpha = 0.6),
                       locations = gt::cells_body(columns = column, rows = 9))
