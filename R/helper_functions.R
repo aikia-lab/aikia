@@ -334,21 +334,21 @@ fill_column <- function(df,gtobj, columns){
     if(as.numeric(df[7,column]) < as.numeric(df[8,column])){
       gtobj <- gtobj %>%
         gt::tab_style(style = gt::cell_fill(color = aikia::aikia_palette_eight()[5],alpha = 0.5),
-                      locations = gt::cells_body(columns = column, rows = 8))
+                      locations = gt::cells_body(columns = column, rows = c(8:9)))
     } else {
       gtobj <- gtobj %>%
         gt::tab_style(style = gt::cell_fill(color = aikia::aikia_palette_eight()[8],alpha = 0.6),
-                      locations = gt::cells_body(columns = column, rows = 8))
+                      locations = gt::cells_body(columns = column, rows = c(8:9)))
     }
 
-    if(as.numeric(df[7,column]) < as.numeric(df[9,column])){
+    if(as.numeric(df[7,column]) < as.numeric(df[10,column])){
       gtobj <- gtobj %>%
         gt::tab_style(style = gt::cell_fill(color = aikia::aikia_palette_eight()[5],alpha = 0.6),
-                      locations = gt::cells_body(columns = column, rows = 9))
+                      locations = gt::cells_body(columns = column, rows = c(10:11)))
     } else {
       gtobj <- gtobj %>%
         gt::tab_style(style = gt::cell_fill(color = aikia::aikia_palette_eight()[8],alpha = 0.5),
-                      locations = gt::cells_body(columns = column, rows = 9))
+                      locations = gt::cells_body(columns = column, rows = c(10:11)))
     }
 
   }

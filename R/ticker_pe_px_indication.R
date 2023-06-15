@@ -60,14 +60,16 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL){
     cat(script_logger("PE ratio has been manually set to"), set_pe,"\n")
   }
 
-  est <- est %>% dplyr::filter(stringr::str_detect(position,"eps_trend_current|eps_trend_30days_ago|ps_trend_60days_ago|eps_trend_90days_ago")) %>%
+  est <-  est %>% dplyr::filter(stringr::str_detect(position,"eps_trend_current|eps_trend_30days_ago|ps_trend_60days_ago|eps_trend_90days_ago")) %>%
     dplyr::select(ticker_yh,position,actual_year,next_year) %>%
     dplyr::left_join(vals[,c("price","ticker_yh","trailingPE","forwardPE")], by = "ticker_yh") %>%
     dplyr::left_join(histo, by = "ticker_yh") %>%
     dplyr::rename(eps_act_yr = actual_year,
                   eps_nxt_yr =next_year) %>%
     dplyr::mutate(indic_px_act_yr = eps_act_yr * ifelse(is.null(set_pe),forwardPE,set_pe),
-                  indic_px_nxt_yr = eps_nxt_yr * ifelse(is.null(set_pe),forwardPE,set_pe)) %>%
+                  indic_px_nxt_yr = eps_nxt_yr * ifelse(is.null(set_pe),forwardPE,set_pe),
+                  price_dif = indic_px_act_yr / price -1,
+                  price_dif2 = indic_px_nxt_yr / price -1) %>%
     dplyr::select(ticker_yh,position,
                   `PE long term` = pe_lt,
                   `PE last 5 Yr` = pe_5y,
@@ -77,7 +79,9 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL){
                   `Estimation eps (nxt yr)` = eps_nxt_yr,
                   `Last Price` = price,
                   `Price Indication (act yr)` = indic_px_act_yr,
-                  `Price Indication (nxt yr)` = indic_px_nxt_yr) %>%
+                  `Price Difference (act yr)` = price_dif,
+                  `Price Indication (nxt yr)` = indic_px_nxt_yr,
+                  `Price Difference (nxt yr)` = price_dif2) %>%
     tidyr::pivot_longer(c(-ticker_yh,-position),names_to = 'name',values_to = 'values') %>%
     tidyr::pivot_wider(dplyr::everything(),names_from = "position",values_from = c("values")) %>%
     dplyr::select(-ticker_yh)
@@ -96,6 +100,12 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL){
       eps_trend_60days_ago = "60 Days ago",
       eps_trend_90days_ago = "90 Days ago") %>%
     gt::cols_align(align = "center") %>%
+    gt::fmt_number(columns = dplyr::everything(),decimals = 2) %>%
+    gt::fmt_percent(columns = dplyr::everything(),
+                    rows =  c(9,11),
+                    decimals = 2) %>%
+    gt::tab_style(style = gt::cell_text(size = gt::px(9)),
+                  locations = gt::cells_body(columns = dplyr::everything(), rows = c(9,11))) %>%
     aikia::gt_theme_aikia() %>%
     gt::tab_footnote(footnote = gt::md(stringr::str_c("Market Data retrieval as of ",vals$date)),
                      placement = "left")
