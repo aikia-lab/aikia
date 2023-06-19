@@ -57,6 +57,13 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
 
   est <- aikia::get_yh_estimates(symbols = stock,as_pivot_long = T)
 
+
+  if(nrow(est)==0){
+    cat(warning("no estimation available\n"))
+    return(est)
+  }
+
+
   if(!is.null(set_pe)){
     cat(script_logger("PE ratio has been manually set to"), set_pe,"\n")
   }
