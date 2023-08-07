@@ -33,7 +33,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic
 
   tictoc::tic()
   # Get new ticker sectors and isin
-  tic_isin <- Rblpapi::bdp(paste(ticker_bb," Equity"), c("ID_ISIN", "NAME", "COUNTRY", "INDUSTRY_GROUP","ISSUER_INDUSTRY",
+  tic_isin <- Rblpapi::bdp(paste(ticker_bb," Equity"), c("ID_ISIN", "NAME", "COUNTRY_ISO", "INDUSTRY_GROUP","ISSUER_INDUSTRY","INDUSTRY_SECTOR",
                                                                                          "BICS_LEVEL_1_SECTOR_NAME","BICS_LEVEL_2_INDUSTRY_GROUP_NAME",
                                                                                          "BICS_LEVEL_3_INDUSTRY_NAME","BICS_LEVEL_4_SUB_INDUSTRY_NAME",
                                                                                          "BICS_LEVEL_5_SEGMENT_NAME","CRNCY")) %>%
