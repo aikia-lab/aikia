@@ -4,12 +4,14 @@
 \alias{adjust_ticker_watchlist}
 \title{Add and Remove Ticker from Watchlist table}
 \usage{
-adjust_ticker_watchlist(add = NULL, remove = NULL)
+adjust_ticker_watchlist(add = NULL, remove = NULL, threshold = 0)
 }
 \arguments{
 \item{add}{provide ticker_yh symbols}
 
 \item{remove}{provide ticker_yh symbols}
+
+\item{threshold}{provide a price limit to get noticed}
 }
 \value{
 no return
