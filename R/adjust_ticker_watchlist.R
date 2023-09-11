@@ -4,6 +4,7 @@
 #'
 #' @param add provide ticker_yh symbols
 #' @param remove provide ticker_yh symbols
+#' @param threshold provide a price limit to get noticed
 #'
 #' @return no return
 #' @export
@@ -12,7 +13,7 @@
 #' @examples\dontrun{
 #'  adjust_ticker_watchlist(add = c("AAPL","ASML","MSFT"))
 #'}
-adjust_ticker_watchlist <- function(add = NULL, remove = NULL){
+adjust_ticker_watchlist <- function(add = NULL, remove = NULL, threshold = 0){
 
   error_logger <- crayon::red $ bold
   success_logger <- crayon::green $ bold
@@ -32,9 +33,9 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL){
 
       con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
       check_tic <- DBI::dbGetQuery(con,stringr::str_c("SELECT name
-                                       FROM fin_ticker_meta_data
-                                       WHERE ticker_yh = '",add,"'")) %>%
-            dplyr::as_tibble()
+                                         FROM fin_ticker_meta_data
+                                         WHERE ticker_yh = '",add,"'")) %>%
+        dplyr::as_tibble()
       DBI::dbDisconnect(con)
 
       if(nrow(check_tic)==0){
@@ -42,7 +43,8 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL){
         return()
       }
 
-      add_sql <- data.frame(ticker_yh = add)
+      add_sql <- data.frame(ticker_yh = add,
+                            threshold = threshold)
 
       con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
       DBI::dbWriteTable(con,
@@ -52,15 +54,15 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL){
 
 
       dubs <- DBI::dbSendQuery(con, "DELETE FROM fin_ticker_watchlist
-        WHERE uid IN (
-          SELECT uid
-          FROM (
-            SELECT *,
-            RANK() OVER (PARTITION BY ticker_yh
-                          ORDER BY updated_at) AS oldest
-            FROM fin_ticker_watchlist
-            ORDER BY updated_at) AS get_values
-          WHERE get_values.oldest = 2)")
+          WHERE uid IN (
+            SELECT uid
+            FROM (
+              SELECT *,
+              RANK() OVER (PARTITION BY ticker_yh
+                            ORDER BY updated_at) AS oldest
+              FROM fin_ticker_watchlist
+              ORDER BY updated_at) AS get_values
+            WHERE get_values.oldest = 2)")
 
       DBI::dbClearResult(dubs) # needed in DBSendQuery as otherwise connection will remains open und not finalized
       DBI::dbDisconnect(con)
@@ -81,8 +83,8 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL){
 
       update <- DBI::dbSendQuery(con,
                                  stringr::str_c("DELETE
-                                      FROM fin_ticker_watchlist
-                                      WHERE ticker_yh IN ('",remove_sql,"')"))
+                                        FROM fin_ticker_watchlist
+                                        WHERE ticker_yh IN ('",remove_sql,"')"))
 
       DBI::dbClearResult(update) # needed in DBSendQuery as otherwise connection will remains open und not finalized
       DBI::dbDisconnect(con)

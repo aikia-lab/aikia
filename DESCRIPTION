@@ -11,6 +11,6 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Imports: DBI, pingr, RMariaDB, bizdays, lubridate, RQuantLib, ggplot2, ggtext, stringr, crayon, stringi, magrittr, rlang, httr, tidyr,
         Rblpapi,TTR,dplyr,glue,gt,janitor,jsonlite,plotly,purrr,quantmod,rvest,scales,tibble,tictoc,tidyquant,timetk,xts,zoo
