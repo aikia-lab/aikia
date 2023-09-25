@@ -19,6 +19,6 @@ Add a personal comment to symbols
 }
 \examples{
 \dontrun{
- set_ticker_comment(symbols = c("AAPL","ASML","MSFT"), comment =c("treated as value than growth tec"))
+ set_ticker_comment("AAPL", comment = c("new comment"))
 }
 }

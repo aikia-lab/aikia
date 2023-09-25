@@ -1,7 +1,19 @@
 
-
-
-get_fred_infos <- function(search_term = "oil", exact = FALSE){
+#' Get ECO TS infos from Meta Data Table
+#'
+#' @param search_term searches in {name*} and {comment} cols
+#' @param exact if {TRUE} filters for exact matches
+#' @param list_all if {TRUE} retuens all available series
+#'
+#' @return a tibble
+#' @export
+#'
+#' @importFrom magrittr %>%
+#'
+#' @examples \dontrun{
+#' get_fred_infos("oil")
+#' }
+get_fred_infos <- function(search_term =NULL, exact = FALSE, list_all = FALSE){
 
 
   warning_logger <- crayon::yellow $ bold
@@ -12,10 +24,21 @@ get_fred_infos <- function(search_term = "oil", exact = FALSE){
   }
 
 
-#  con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
-  con <- aikiaTrade::connect_to_db(group = "fin_data")
-#  DBI::dbDisconnect(con)
-#  DBI::dbListFields(con,"eco_ts_meta_data")
+  if(list_all){
+    con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+
+    all <- DBI::dbReadTable(con,"eco_ts_meta_data") %>%
+      dplyr::as_tibble() %>%
+      dplyr::select(.data$series,.data$name,.data$name_short,.data$frequency)
+
+    DBI::dbDisconnect(con)
+
+    return(all)
+
+  }
+
+
+  con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
 
   result <- DBI::dbGetQuery(con,stringr::str_c("SELECT *
                               FROM eco_ts_meta_data
