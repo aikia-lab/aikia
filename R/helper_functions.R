@@ -100,7 +100,7 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
                   error=function(e) e)
 
   if(inherits(res, 'error')){
-    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    cat(error_logger(paste0("no estimate data avialble for '", symbol,"'! Please check symbol\n")))
     return()
   }
 
@@ -109,7 +109,7 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
   }), error=function(e) e)
 
   if(inherits(flat, 'error')){
-    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    cat(error_logger(paste0("no estimate data avialble for '", symbol,"'! Please check symbol\n")))
     return()
   }
 
@@ -120,7 +120,7 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
     janitor::clean_names(), error=function(e) e)
 
   if(inherits(df, 'error')){
-    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    cat(error_logger(paste0("no estimate data avialble for '", symbol,"'! Please check symbol\n")))
     return()
   }
 
