@@ -13,45 +13,14 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
   }
 
   if(period == "annual"){
-    timespan <- "incomeStatementHistory,balanceSheetHistory,cashflowStatementHistory"
+    timespan_vec <- c("incomeStatementHistory","balanceSheetHistory","cashflowStatementHistory")
   } else {
-    timespan <- "incomeStatementHistoryQuarterly,balanceSheetHistoryQuarterly,cashflowStatementHistoryQuarterly"
-  }
-  # compose the request
-  url <- glue::glue("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules={timespan}")
-
-  res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
-             error=function(e) e)
-
-  if(inherits(res, 'error')){
-    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
-    return()
+    timespan_vec <- c("incomeStatementHistoryQuarterly","balanceSheetHistoryQuarterly","cashflowStatementHistoryQuarterly")
   }
 
-  flat <- tryCatch(lapply(res, function(x) {
-      x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
-    }), error=function(e) e)
+  df_list_raw <- purrr::map(timespan_vec,get_yh_single_financials_hf)
 
-  if(inherits(flat, 'error')){
-    cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
-    return()
-  }
-
-  df <- suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
-    dplyr::mutate(endDate.raw = lubridate::as_datetime(.data$endDate.raw)) %>%
-    dplyr::select(dplyr::contains(".raw"))
-
-  colnames(df) <- gsub(".raw", "", colnames(df))
-
-  if ("capitalExpenditures" %in% names(df)) {
-    df <- df %>% dplyr::mutate(freeCashflow = .data$totalCashFromOperatingActivities +
-                                  .data$capitalExpenditures)
-  } else if("totalCashFromOperatingActivities" %in% names(df)){
-    df <- df %>% dplyr::mutate(freeCashflow = .data$totalCashFromOperatingActivities)
-  } else {
-    df <- df %>% dplyr::mutate(freeCashflow = NA)
-  }
-
+  df <- merge_list_of_df_w_same_columns_hf(df_list_raw)
 
   if(as_pivot_long == TRUE){
     df <- df %>%
@@ -69,6 +38,49 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 }
 
 
+get_yh_single_financials_hf <- function(timespan){
+
+    # compose the request
+    url <- glue::glue("https://query2.finance.yahoo.com/v6/finance/quoteSummary/{symbol}?modules={timespan}")
+
+    res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
+                    error=function(e) e)
+
+    if(inherits(res, 'error')){
+      cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+      return()
+    }
+
+    flat <- tryCatch(lapply(res, function(x) {
+      x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
+    }), error=function(e) e)
+
+    if(inherits(flat, 'error')){
+      cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+      return()
+    }
+
+    df <- suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
+      dplyr::mutate(endDate.raw = lubridate::as_datetime(.data$endDate.raw)) %>%
+      dplyr::select(dplyr::contains(".raw"))
+
+    colnames(df) <- gsub(".raw", "", colnames(df))
+
+    if ("capitalExpenditures" %in% names(df)) {
+      df <- df %>% dplyr::mutate(freeCashflow = .data$totalCashFromOperatingActivities +
+                                   .data$capitalExpenditures)
+    } else if("totalCashFromOperatingActivities" %in% names(df)){
+      df <- df %>% dplyr::mutate(freeCashflow = .data$totalCashFromOperatingActivities)
+    } else {
+      df <- df %>% dplyr::mutate(freeCashflow = NA)
+    }
+
+    return(df)
+
+}
+
+
+
 
 get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose = FALSE){
 
@@ -82,7 +94,7 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
 
 
   # compose the request
-  url <- glue::glue("https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true")
+  url <- glue::glue("https://query2.finance.yahoo.com/v6/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true")
 
   res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
                   error=function(e) e)
@@ -354,3 +366,37 @@ fill_column <- function(df,gtobj, columns){
   }
   return(gtobj)
 }
+
+
+
+# helper function to merge columns with same name by fewer NAs
+merge_list_of_df_w_same_columns_hf <- function(df_list) {
+  # Get the unique column names of list
+  unique_cols <- unique(unlist(lapply(df_list, names)))
+
+  # Initialize an empty list to store selected columns
+  selected_cols <- list()
+
+  for (col_name in unique_cols) {
+
+    # Extract columns with the same name from all data frames
+    col_data <- lapply(df_list, function(df) df[[col_name]])
+
+    # Find the index of the column with fewer NAs
+    min_na_index <- which.max(sapply(col_data, function(col) sum(!is.na(col))))
+
+    # Add the selected column to the list
+    selected_cols[[col_name]] <- col_data[[min_na_index]]
+
+  }
+
+  # Combine the selected columns into a data frame
+  result_df <- as.data.frame(selected_cols)
+
+  return(result_df)
+}
+
+
+
+
+

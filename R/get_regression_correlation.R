@@ -37,7 +37,7 @@ get_regression_correlation <- function(symbols = c("AAPL","DCOILWTICO","T10Y2Y",
   }
 
 
-  con <- aikiaTrade::connect_to_db(group = "fin_data")
+  con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
 
   all_sorted <- tibble::tibble()
   for(i in symbols){
