@@ -18,7 +18,7 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
     timespan_vec <- c("incomeStatementHistoryQuarterly","balanceSheetHistoryQuarterly","cashflowStatementHistoryQuarterly")
   }
 
-  df_list_raw <- purrr::map(timespan_vec,get_yh_single_financials_hf)
+  df_list_raw <- purrr::map(timespan_vec,get_yh_single_financials_hf,symbol=symbol)
 
   df <- merge_list_of_df_w_same_columns_hf(df_list_raw)
 
@@ -38,7 +38,7 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 }
 
 
-get_yh_single_financials_hf <- function(timespan){
+get_yh_single_financials_hf <- function(timespan,symbol){
 
     # compose the request
     url <- glue::glue("https://query2.finance.yahoo.com/v6/finance/quoteSummary/{symbol}?modules={timespan}")
