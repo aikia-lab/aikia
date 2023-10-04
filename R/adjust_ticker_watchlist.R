@@ -31,7 +31,7 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL, threshold = 0){
     if(!is.null(add)){
 
 
-      con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+      con <- aikia::connect_to_db()
       check_tic <- DBI::dbGetQuery(con,stringr::str_c("SELECT name
                                          FROM fin_ticker_meta_data
                                          WHERE ticker_yh = '",add,"'")) %>%
@@ -46,7 +46,7 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL, threshold = 0){
       add_sql <- data.frame(ticker_yh = add,
                             threshold = threshold)
 
-      con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+      con <- aikia::connect_to_db()
       DBI::dbWriteTable(con,
                         name = "fin_ticker_watchlist",
                         value = add_sql,
@@ -79,7 +79,7 @@ adjust_ticker_watchlist <- function(add = NULL, remove = NULL, threshold = 0){
         remove_sql <- stringr::str_c(remove,collapse = "','")
       }
 
-      con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+      con <- aikia::connect_to_db()
 
       update <- DBI::dbSendQuery(con,
                                  stringr::str_c("DELETE

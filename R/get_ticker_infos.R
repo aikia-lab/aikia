@@ -21,7 +21,7 @@ get_ticker_infos <- function(search_term = NULL, exact = FALSE){
   }
 
 
-  con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+  con <- aikia::connect_to_db()
   result <- DBI::dbGetQuery(con,stringr::str_c("SELECT *
                               FROM fin_ticker_meta_data
                               WHERE ticker_yh LIKE CONCAT('%','",search_term,"','%')

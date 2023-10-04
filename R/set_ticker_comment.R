@@ -23,7 +23,7 @@ set_ticker_comment <- function(symbols = NULL, comments = NULL){
 
   for(check_tic in symbols){
 
-    mydb <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+    mydb <- aikia::connect_to_db()
     check_comm <- DBI::dbGetQuery(mydb,stringr::str_c("SELECT comment
                                   FROM fin_ticker_meta_data
                                   WHERE ticker_yh = '",check_tic,"'")) %>%
@@ -49,7 +49,7 @@ set_ticker_comment <- function(symbols = NULL, comments = NULL){
       }
 
       else if(case == 2){
-        mydb <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+        mydb <- aikia::connect_to_db()
 
         comment_send <- DBI::dbSendQuery(mydb,stringr::str_c("UPDATE fin_ticker_meta_data
                                    SET comment = '",comments,"'
@@ -65,7 +65,7 @@ set_ticker_comment <- function(symbols = NULL, comments = NULL){
 
         new_comment <- stringr::str_c(check_comm,comments,sep = ". ")
 
-        mydb <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+        mydb <- aikia::connect_to_db()
 
         comment_send <- DBI::dbSendQuery(mydb,stringr::str_c("UPDATE fin_ticker_meta_data
                                    SET comment = '",new_comment,"'
@@ -86,7 +86,7 @@ set_ticker_comment <- function(symbols = NULL, comments = NULL){
     } else {
       cat(script_logger("No previous comment noted for"),check_tic,script_logger(". Saving new comment:\n",comments,"\n"))
 
-      mydb <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+      mydb <- aikia::connect_to_db()
 
       comment_send <- DBI::dbSendQuery(mydb,stringr::str_c("UPDATE fin_ticker_meta_data
                                    SET comment = '",comments,"'

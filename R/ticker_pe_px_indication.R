@@ -21,7 +21,7 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
   script_logger <- crayon::bold $ cyan
 
 
-  con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+  con <- aikia::connect_to_db()
 
   vals <- DBI::dbGetQuery(con,stringr::str_c(
     "SELECT

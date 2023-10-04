@@ -60,7 +60,7 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
   # get data ----------------------------------------------------------------
 
 
-  con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+  con <- aikia::connect_to_db()
 
   if(is.null(country)){
     region <- ""

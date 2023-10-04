@@ -64,7 +64,7 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
     tic_sql <- ticker_list %>%
       stringr::str_c(collapse = "','") # first and last ' willl be added in sql query !!
 
-    mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     # Get ticker history out of Data Base
     tic_history <-  DBI::dbGetQuery(mydb, stringr::str_c("SELECT *
@@ -83,7 +83,7 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
     ticker_vola <- purrr::map_df(unique(ticker_list), ticker_vola_fun, data = tic_history, required_date = valuation_date, verbose = verbose)
 
     # connect to db
-    mydb <- aikia::connect_to_db(user="ceilert",password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     DBI::dbWriteTable(conn = mydb,
                       name = "fin_ticker_sensi_history",
@@ -100,7 +100,7 @@ update_tic_sensis_history_in_db <- function(ticker_list = NULL, start_date = FAL
 
     if(verbose){cat(info_cat("deleting all duplicates in 'fin_ticker_sensi_history'\n"))}
 
-    mydb <- aikia::connect_to_db(user="ceilert",password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     # Delete dublicate rows
     DBI::dbSendQuery(mydb,"DELETE

@@ -33,7 +33,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
 
   if(check_min_date_start == TRUE){ # checks the minimum available date in DB and resets "START"
 
-    mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     start_new <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT
                                                      MIN(fin_ticker_history.date) AS min_date,
@@ -57,7 +57,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
 
   if(check_max_date_start == TRUE){ # checks the maximum available date in DB and resets "START"
 
-    mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     start_new <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT
                                                      MAX(fin_ticker_history.date) AS max_date,
@@ -81,7 +81,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
 
   if(check_max_date_end == TRUE){ # checks the maximum available date in DB nd resets "END"
 
-    mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     end_new <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT
                                                      MAX(fin_ticker_history.date) AS max_date,
@@ -105,7 +105,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
 
   if(check_min_date_end == TRUE){ # checks the minimum available date in DB nd resets "END"
 
-    mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     end_new <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT
                                                      MIN(fin_ticker_history.date) AS min_date,
@@ -149,7 +149,7 @@ get_bb_ticker_hist_data <- function(stock, start = NULL, end = aikia::val_date()
 
   if(change_ticker == TRUE){
 
-    mydb <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    mydb <- aikia::connect_to_db()
 
     ticker <- DBI::dbGetQuery(mydb, stringr::str_c("SELECT ticker_bb, ticker_yh
                                                     FROM fin_ticker_meta_data

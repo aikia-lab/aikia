@@ -9,9 +9,9 @@
 #' @export
 #'
 #' @examples \dontrun{
-#' connect_to_DB(user = "testuser", password = "password")
+#' connect_to_db(user = "testuser", password = "password")
 #' }
-connect_to_db <- function(mydb, database = "fin_data", user, password){
+connect_to_db <- function(mydb, database = "fin_data", user=NULL, password=NULL){
 
   ip <- unlist(pingr::nsl("aikia.org")$answer$data)
 
@@ -23,8 +23,8 @@ connect_to_db <- function(mydb, database = "fin_data", user, password){
                              host = ip,
                              user = user,
                              password = password,
-                             port = 3306,
-                             dbname = database)
+                             group = database,
+                             default.file = "C:/Users/Admin/Documents/Git Projects/aikia/my.cnf")
   }
 }
 

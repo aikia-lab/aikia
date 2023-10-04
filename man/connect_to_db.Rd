@@ -4,7 +4,7 @@
 \alias{connect_to_db}
 \title{Establishing a connection to the aikia database}
 \usage{
-connect_to_db(mydb, database = "fin_data", user, password)
+connect_to_db(mydb, database = "fin_data", user = NULL, password = NULL)
 }
 \arguments{
 \item{mydb}{A mydb connection from DBI::dbConnect}
@@ -23,6 +23,6 @@ Establishing a connection to the aikia database
 }
 \examples{
 \dontrun{
-connect_to_DB(user = "testuser", password = "password")
+connect_to_db(user = "testuser", password = "password")
 }
 }

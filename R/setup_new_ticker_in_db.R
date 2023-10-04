@@ -49,7 +49,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic
 
 
   #Check if already exists in DB
-  con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+  con <- aikia::connect_to_db()
 
   # get old ticker meta data
   meta_data <- DBI::dbGetQuery(con, stringr::str_c("SELECT *
@@ -87,7 +87,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic
     cat(info_cat(" \ with yahoo ticker:"),warning_cat(tic_isin$ticker_yh),info_cat("\n \ and finviz:"),warning_cat(tic_isin$ticker_fv),info_cat("\nin meta data table\n\n"))
 
     # update new tickers to db
-    con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    con <- aikia::connect_to_db()
     DBI::dbWriteTable(con,
                       name= "fin_ticker_meta_data",
                       value = tic_isin,
@@ -105,7 +105,7 @@ setup_new_ticker_in_db <- function(ticker_bb, provide_tic_yh = NULL, provide_tic
 
     new_hist <- aikia::get_bb_ticker_hist_data(stock = ticker_bb, start = start_history, change_ticker = TRUE)
 
-    con <- aikia::connect_to_db(user = "ceilert", password = "ceilert")
+    con <- aikia::connect_to_db()
 
     # append new history
     DBI::dbWriteTable(con,

@@ -25,7 +25,7 @@ get_fred_infos <- function(search_term =NULL, exact = FALSE, list_all = FALSE){
 
 
   if(list_all){
-    con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+    con <- aikia::connect_to_db()
 
     all <- DBI::dbReadTable(con,"eco_ts_meta_data") %>%
       dplyr::as_tibble() %>%
@@ -38,7 +38,7 @@ get_fred_infos <- function(search_term =NULL, exact = FALSE, list_all = FALSE){
   }
 
 
-  con <- aikia::connect_to_db(user = "ceilert",password = "ceilert")
+  con <- aikia::connect_to_db()
 
   result <- DBI::dbGetQuery(con,stringr::str_c("SELECT *
                               FROM eco_ts_meta_data
