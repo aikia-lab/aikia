@@ -4,11 +4,9 @@
 \alias{connect_to_db}
 \title{Establishing a connection to the aikia database}
 \usage{
-connect_to_db(mydb, database = "fin_data", user = NULL, password = NULL)
+connect_to_db(database = "fin_data", user = NULL, password = NULL)
 }
 \arguments{
-\item{mydb}{A mydb connection from DBI::dbConnect}
-
 \item{database}{The database name}
 
 \item{user}{Your MariaDB Username}
