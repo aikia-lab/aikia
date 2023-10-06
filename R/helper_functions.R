@@ -20,6 +20,12 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 
   df_list_raw <- purrr::map(timespan_vec,get_yh_single_financials_hf,symbol=symbol)
 
+  # retun 0 if all lists are empty
+  if(all(!lengths(df_list_raw))){
+    cat(error_logger("all financials are empty for"),symbol,"\n")
+    return()
+  }
+
   df <- merge_list_of_df_w_same_columns_hf(df_list_raw)
 
   if(as_pivot_long == TRUE){
@@ -43,11 +49,12 @@ get_yh_single_financials_hf <- function(timespan,symbol){
     # compose the request
     url <- glue::glue("https://query2.finance.yahoo.com/v6/finance/quoteSummary/{symbol}?modules={timespan}")
 
-    res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
-                    error=function(e) e)
 
-    if(inherits(res, 'error')){
-      cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
+    res <-suppressWarnings(tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
+                    error=function(e) e)
+    )
+
+    if(inherits(res, 'error')||ncol(res)==0){
       return()
     }
 
@@ -56,7 +63,6 @@ get_yh_single_financials_hf <- function(timespan,symbol){
     }), error=function(e) e)
 
     if(inherits(flat, 'error')){
-      cat(error_logger(paste0("no financial data avialble for '", symbol,"'! Please check symbol\n")))
       return()
     }
 
