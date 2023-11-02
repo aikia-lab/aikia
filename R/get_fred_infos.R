@@ -19,9 +19,6 @@ get_fred_infos <- function(search_term =NULL, exact = FALSE, list_all = FALSE){
   warning_logger <- crayon::yellow $ bold
   error_logger <- crayon::red $ bold
 
-  if(is.null(search_term)){
-    stop(error_logger("Specify Search Term\n"))
-  }
 
 
   if(list_all){
@@ -37,6 +34,9 @@ get_fred_infos <- function(search_term =NULL, exact = FALSE, list_all = FALSE){
 
   }
 
+  if(is.null(search_term)){
+    stop(error_logger("Specify Search Term\n"))
+  }
 
   con <- aikia::connect_to_db()
 

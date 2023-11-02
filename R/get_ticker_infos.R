@@ -7,6 +7,8 @@
 #' @return a tibble
 #' @export
 #'
+#' @importFrom magrittr %>%
+#'
 #' @examples\dontrun{
 #' get_ticker_infos("DBK.DE")
 #' }
