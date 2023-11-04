@@ -3,10 +3,46 @@
 # Liste an allen modules
 # https://github.com/pilwon/node-yahoo-finance/issues/52
 
+get_crumb <- function(){
+  # Unbale to obtain yahoo crumb. If this is being called from a GDPR country, Yahoo requires GDPR consent, which cannot be scripted
+  ses <- list()
+  ses$h <- curl::new_handle()
+  # yahoo finance doesn't seem to set cookies without these headers
+  # and the cookies are needed to get the crumb
+  curl::handle_setheaders(ses$h,
+                          accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                          "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.183")
+  URL <- "https://finance.yahoo.com/"
+  r <- curl::curl_fetch_memory(URL, handle = ses$h)
+  # yahoo redirects to a consent form w/ a single cookie for GDPR:
+  # detecting the redirect seems very brittle as its sensitive to the trailing "/"
+  ses$can.crumb <- ((r$status_code == 200) && (URL == r$url) && (NROW(curl::handle_cookies(ses$h)) > 1))
+
+  if (ses$can.crumb) {
+    # get a crumb so that downstream callers don't have to handle invalid sessions.
+    # this is a network hop, but very lightweight payload
+    n <- if (unclass(Sys.time()) %% 1L >= 0.5) 1L else 2L
+
+    query.srv <- paste0("https://query", n, ".finance.yahoo.com/v1/test/getcrumb")
+    r <- curl::curl_fetch_memory(query.srv, handle = ses$h)
+
+    if ((r$status_code == 200) && (length(r$content) > 0)) {
+      ses$crumb <- rawToChar(r$content)
+
+      # assign the crumb to the global environment
+      assign("ses",ses,envir = .GlobalEnv)
+  #    list2env(ses, envir = .GlobalEnv) # probably need to assign a list ???
+
+    }
+  }
+}
+
+
 get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_long = FALSE, verbose = FALSE){
 
   script_logger <- crayon::bold $ bold
   error_logger <- crayon::magenta $ bold
+
 
   if(verbose == TRUE){
     cat(script_logger("retrieving data for ",symbol,"\n"))
@@ -46,11 +82,17 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 
 get_yh_single_financials_hf <- function(timespan,symbol){
 
+
+  # cookie needed first as yahoo can only be fetched outside GDPR countries
+  if(!exists(ses)){
+    get_crumb()
+  }
+
     # compose the request
-    url <- glue::glue("https://query2.finance.yahoo.com/v6/finance/quoteSummary/{symbol}?modules={timespan}")
+    url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules={module}&ssl=true&crumb={ses$crumb}')
 
 
-    res <-suppressWarnings(tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
+    res <-suppressWarnings(tryCatch(jsonlite::fromJSON(curl::curl(url, handle = ses$h))$quoteSummary$result,
                     error=function(e) e)
     )
 
