@@ -44,7 +44,7 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
   error_logger <- crayon::magenta $ bold
 
 
-  if(verbose == TRUE){
+  if(verbose){
     cat(script_logger("retrieving data for ",symbol,"\n"))
   }
 
@@ -54,7 +54,7 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
     timespan_vec <- c("incomeStatementHistoryQuarterly","balanceSheetHistoryQuarterly","cashflowStatementHistoryQuarterly")
   }
 
-  df_list_raw <- purrr::map(timespan_vec,get_yh_single_financials_hf,symbol=symbol)
+  df_list_raw <- purrr::map(timespan_vec,get_yh_single_financials_hf,symbol=symbol,verbose=verbose)
 
   # retun 0 if all lists are empty
   if(all(!lengths(df_list_raw))){
@@ -64,7 +64,7 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 
   df <- merge_list_of_df_w_same_columns_hf(df_list_raw)
 
-  if(as_pivot_long == TRUE){
+  if(as_pivot_long){
     df <- df %>%
       dplyr::arrange(desc(endDate)) %>%
       tidyr::pivot_longer(-1,names_to = "position", values_to = "values") %>%
@@ -80,11 +80,14 @@ get_yh_financials_hf <- function (symbol = NULL, period = 'annual', as_pivot_lon
 }
 
 
-get_yh_single_financials_hf <- function(timespan,symbol){
+get_yh_single_financials_hf <- function(timespan,symbol,verbose){
 
 
   # cookie needed first as yahoo can only be fetched outside GDPR countries
   if(!exists("ses")){
+    if(verbose){
+      cat(script_logger("setup new crumb\n"))
+    }
     get_crumb()
   }
 
@@ -97,8 +100,16 @@ get_yh_single_financials_hf <- function(timespan,symbol){
     )
 
     if(inherits(res, 'error')||ncol(res)==0){
+      if(verbose){
+        cat(as.character(res))
+      }
+      if(inherits(res,"handle is dead")){
+        rm(ses)
+        cat(script_logger("previous crumb deleted\n"))
+      }
       return()
     }
+
 
     flat <- tryCatch(lapply(res, function(x) {
       x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
@@ -142,6 +153,9 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
 
   # cookie needed first as yahoo can only be fetched outside GDPR countries
   if(!exists("ses")){
+    if(verbose){
+      cat(script_logger("setup new crumb\n"))
+    }
     get_crumb()
   }
 
