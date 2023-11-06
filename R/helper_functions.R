@@ -84,12 +84,12 @@ get_yh_single_financials_hf <- function(timespan,symbol){
 
 
   # cookie needed first as yahoo can only be fetched outside GDPR countries
-  if(!exists(ses)){
+  if(!exists("ses")){
     get_crumb()
   }
 
-    # compose the request
-    url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules={module}&ssl=true&crumb={ses$crumb}')
+  # compose the request
+  url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules={timespan}&ssl=true&crumb={ses$crumb}')
 
 
     res <-suppressWarnings(tryCatch(jsonlite::fromJSON(curl::curl(url, handle = ses$h))$quoteSummary$result,
@@ -140,9 +140,13 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
     cat(script_logger("retrieving data for ",symbol,"\n"))
   }
 
+  # cookie needed first as yahoo can only be fetched outside GDPR countries
+  if(!exists("ses")){
+    get_crumb()
+  }
 
   # compose the request
-  url <- glue::glue("https://query2.finance.yahoo.com/v6/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true")
+  url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true&crumb={ses$crumb}')
 
   res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
                   error=function(e) e)
