@@ -2,6 +2,8 @@
 
 # Liste an allen modules
 # https://github.com/pilwon/node-yahoo-finance/issues/52
+# Auflistung
+# https://rdrr.io/github/n0Trader/TDI/man/yahooAPI.html
 
 get_crumb <- function(){
   # Unbale to obtain yahoo crumb. If this is being called from a GDPR country, Yahoo requires GDPR consent, which cannot be scripted
@@ -95,6 +97,12 @@ get_yh_single_financials_hf <- function(timespan,symbol,verbose){
   url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules={timespan}&ssl=true&crumb={ses$crumb}')
 
 
+  if(verbose){
+    cat(script_logger("used url call:\n"))
+    url
+    cat("\n")
+  }
+
     res <-suppressWarnings(tryCatch(jsonlite::fromJSON(curl::curl(url, handle = ses$h))$quoteSummary$result,
                     error=function(e) e)
     )
@@ -159,16 +167,25 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
     get_crumb()
   }
 
+
   # compose the request
   url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true&crumb={ses$crumb}')
 
-  res <- tryCatch(jsonlite::fromJSON(url)$quoteSummary$result,
-                  error=function(e) e)
+  res <- suppressWarnings(tryCatch(jsonlite::fromJSON(curl::curl(url, handle = ses$h))$quoteSummary$result,
+                                   error=function(e) e))
 
-  if(inherits(res, 'error')){
+  if(inherits(res, 'error')||ncol(res)==0){
+    if(verbose){
+      cat(as.character(res))
+    }
+    if(inherits(res,"handle is dead")){
+      rm(ses)
+      cat(script_logger("previous crumb deleted\n"))
+    }
     cat(error_logger(paste0("no estimate data avialble for '", symbol,"'! Please check symbol\n")))
     return()
   }
+
 
   flat <- tryCatch(lapply(res, function(x) {
     x[[1]][[1]] %>% dplyr::select(-.data$maxAge)
@@ -180,10 +197,10 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
   }
 
   df <- tryCatch(suppressMessages(Reduce(dplyr::full_join, flat)) %>% jsonlite::flatten() %>%
-    dplyr::mutate(endDate = lubridate::as_datetime(.data$endDate)) %>%
-    dplyr::select(growth_period = period,endDate,dplyr::contains(".raw")) %>%
-    dplyr::relocate('growth.raw',.after = 'growth_period') %>%
-    janitor::clean_names(), error=function(e) e)
+                   dplyr::mutate(endDate = lubridate::as_datetime(.data$endDate)) %>%
+                   dplyr::select(growth_period = period,endDate,dplyr::contains(".raw")) %>%
+                   dplyr::relocate('growth.raw',.after = 'growth_period') %>%
+                   janitor::clean_names(), error=function(e) e)
 
   if(inherits(df, 'error')){
     cat(error_logger(paste0("no estimate data avialble for '", symbol,"'! Please check symbol\n")))
