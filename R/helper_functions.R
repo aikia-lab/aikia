@@ -167,7 +167,6 @@ get_yh_estimates_hf <- function (symbol = NULL, as_pivot_long = FALSE, verbose =
     get_crumb()
   }
 
-
   # compose the request
   url <- glue::glue('https://query2.finance.yahoo.com/v10/finance/quoteSummary/{symbol}?modules=earningsTrend&ssl=true&crumb={ses$crumb}')
 
