@@ -27,21 +27,21 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
     "SELECT
                       CAST(retrieval_time as date) as date,
                       ticker_yh,
-                      regularMarketPrice as price,
-                      trailingPE,
-                      trailingEps,
-                      forwardEps,
-                      forwardPE,
-                      priceToBook,
-                      bookValue,
-                      floatShares
+                      regular_market_price as price,
+                      trailing_pe,
+                      trailing_eps,
+                      forward_eps,
+                      forward_pe,
+                      price_to_book,
+                      book_value,
+                      float_shares
                   FROM fin_ticker_market_snapshot
                   WHERE ticker_yh = '",stock,"'
                   ORDER BY retrieval_time DESC
                   LIMIT 1")) %>%
     dplyr::as_tibble() %>%
-    dplyr::mutate(impl_px_eps_pe = forwardEps * forwardPE,
-                  impl_px_pbv = bookValue * priceToBook)
+    dplyr::mutate(impl_px_eps_pe = forward_eps * forward_pe,
+                  impl_px_pbv = book_value * price_to_book)
 
 
   histo <- DBI::dbGetQuery(con,stringr::str_c(
@@ -54,35 +54,54 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
 
   DBI::dbDisconnect(con)
 
+  # not working since GDPR is in place
+  #  est <- aikia::get_yh_estimates(symbols = stock,as_pivot_long = T)
 
-  est <- aikia::get_yh_estimates(symbols = stock,as_pivot_long = T)
-
+  con <- aikia::connect_to_db(database = "tony_data")
+  est <- DBI::dbGetQuery(con,stringr::str_c("SELECT *
+                                     FROM yahoo_financials_estimates
+                                     WHERE symbol = '",stock,"'
+                                     AND pull_date = (SELECT max(pull_date)
+                                                      FROM yahoo_financials_estimates
+                                                      WHERE symbol = '",stock,"')"))
+  DBI::dbDisconnect(con)
 
   if(nrow(est)==0){
     cat(warning("no estimation available\n"))
     return(est)
   }
 
+  est <- est %>%
+    dplyr::arrange(desc(end_date)) %>%
+    dplyr::select(-growth_period,-growth,-end_date) %>%
+    tidyr::drop_na(est_period) %>%
+    dplyr::mutate(dplyr::across(.col = dplyr::everything(),.fns = as.character)) %>%
+    tidyr::pivot_longer(-c(symbol,est_period),names_to = "position", values_to = "values") %>%
+    tidyr::pivot_wider(names_from = est_period,values_from = values) %>%
+    dplyr::rename(ticker_yh = symbol) %>%
+    dplyr::relocate(ticker_yh,.before = "position")
 
   if(!is.null(set_pe)){
     cat(script_logger("PE ratio has been manually set to"), set_pe,"\n")
   }
 
-  est <-  est %>% dplyr::filter(stringr::str_detect(position,"eps_trend_current|eps_trend_30days_ago|ps_trend_60days_ago|eps_trend_90days_ago")) %>%
+  est <-
+    est %>% dplyr::filter(stringr::str_detect(position,"eps_trend_current|eps_trend_30days_ago|ps_trend_60days_ago|eps_trend_90days_ago")) %>%
     dplyr::select(ticker_yh,position,actual_year,next_year) %>%
-    dplyr::left_join(vals[,c("price","ticker_yh","trailingPE","forwardPE")], by = "ticker_yh") %>%
+    dplyr::left_join(vals[,c("price","ticker_yh","trailing_pe","forward_pe")], by = "ticker_yh") %>%
     dplyr::left_join(histo, by = "ticker_yh") %>%
     dplyr::rename(eps_act_yr = actual_year,
                   eps_nxt_yr =next_year) %>%
-    dplyr::mutate(indic_px_act_yr = eps_act_yr * ifelse(is.null(set_pe),forwardPE,set_pe),
-                  indic_px_nxt_yr = eps_nxt_yr * ifelse(is.null(set_pe),forwardPE,set_pe),
+    dplyr::mutate(dplyr::across(.col = c("eps_act_yr","eps_nxt_yr"),.fns = as.numeric)) %>%
+    dplyr::mutate(indic_px_act_yr = eps_act_yr * ifelse(is.null(set_pe),forward_pe,set_pe),
+                  indic_px_nxt_yr = eps_nxt_yr * ifelse(is.null(set_pe),forward_pe,set_pe),
                   price_dif = indic_px_act_yr / price -1,
                   price_dif2 = indic_px_nxt_yr / price -1) %>%
     dplyr::select(ticker_yh,position,
                   `PE long term` = pe_lt,
                   `PE last 5 Yr` = pe_5y,
-                  `Trailing PE` = trailingPE,
-                  `Forward PE` = forwardPE,
+                  `Trailing PE` = trailing_pe,
+                  `Forward PE` = forward_pe,
                   `Estimation eps (act yr)` = eps_act_yr,
                   `Estimation eps (nxt yr)` = eps_nxt_yr,
                   `Last Price` = price,
@@ -91,7 +110,7 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
                   `Price Indication (nxt yr)` = indic_px_nxt_yr,
                   `Price Difference (nxt yr)` = price_dif2) %>%
     tidyr::pivot_longer(c(-ticker_yh,-position),names_to = 'name',values_to = 'values') %>%
-    tidyr::pivot_wider(dplyr::everything(),names_from = "position",values_from = c("values"))
+    tidyr::pivot_wider(id_cols = dplyr::everything(),names_from = "position",values_from = c("values"))
 
 
   if(as_gt == FALSE){
@@ -112,8 +131,8 @@ ticker_pe_px_indication <- function(stock = NULL, set_pe = NULL, as_gt = TRUE){
       eps_trend_60days_ago = "60 Days ago",
       eps_trend_90days_ago = "90 Days ago") %>%
     gt::cols_align(align = "center") %>%
-    gt::fmt_number(columns = dplyr::everything(),decimals = 2) %>%
-    gt::fmt_percent(columns = dplyr::everything(),
+    gt::fmt_number(columns = is.numeric,decimals = 2) %>%
+    gt::fmt_percent(columns = is.numeric,
                     rows =  c(9,11),
                     decimals = 2) %>%
     gt::tab_style(style = gt::cell_text(size = gt::px(9)),

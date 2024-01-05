@@ -37,23 +37,23 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
 
   needed_ratios <- tibble::tribble(
     ~ratios, ~pref_direction,~groups, ~comment,
-    'trailingPE', 'lower','Valuations', "last 12 month Price/Earnings Ratio",
-    'forwardPE',  'lower','Valuations',  "expected next 12 month Price/Earnings Ratio",
-    'pegRatio',   'lower','Ratios', "Price/Earnings to Growth Ratio (Relates the PE ratio of a company to its expected earnings growth.
+    'trailing_pe', 'lower','Valuations', "last 12 month Price/Earnings Ratio",
+    'forward_pe',  'lower','Valuations',  "expected next 12 month Price/Earnings Ratio",
+    'peg_ratio',   'lower','Ratios', "Price/Earnings to Growth Ratio (Relates the PE ratio of a company to its expected earnings growth.
                                               Particularly in the case of growth stocks, whose PE ratio tends to be higher and can therefore be
                                                perceived as overvalued, the PEG ratio offers the possibility of achieving more meaningful results.",
-    'shortRatio', 'lower','Ratios',    "proportion of securities sold short divided by the average daily trading volume. The ratio can be used,
+    'short_ratio', 'lower','Ratios',    "proportion of securities sold short divided by the average daily trading volume. The ratio can be used,
                                                 for example, as a sentiment indicator.",
-    'quickRatio', 'higher','Ratios',   "ratio of the company's available financial assets plus shares and current receivables to current liabilities.",
-    'currentRatio', 'higher','Ratios', "The current ratio is a liquidity ratio that measures whether a firm has enough resources to meet its short-term obligations.
+    'quick_ratio', 'higher','Ratios',   "ratio of the company's available financial assets plus shares and current receivables to current liabilities.",
+    'current_ratio', 'higher','Ratios', "The current ratio is a liquidity ratio that measures whether a firm has enough resources to meet its short-term obligations.
                                                 It compares a firm's current assets to its current liabilities",
-    'earningsGrowth', 'higher','Growth', "Earnings growth rate is a key value that is needed when the Discounted cash flow model.",
-    'ebitdaMargins', 'higher','Margins', "The EBITDA margin is calculated by dividing EBITDA by revenue.",
-    'grossMargins', 'higher', 'Margins',"Gross margin measures a company's gross profit compared to its revenues as a percentage.",
-    'operatingMargins', 'higher','Margins', "The operating margin represents how efficiently a company is able to generate profit through its core operations.",
-    'profitMargins', 'higher','Margins', "Expressed as a percentage, profit margin indicates how many cents of profit has been generated for each dollar of sale.",
-    'revenueGrowth', 'higher','Growth', "revenue growth is an increase in a company's sales in one year to the previous year. For an accurate picture of growth, investors should look at the growth of several quarters and how consistent it is.",
-    'returnOnAssets', 'higher','Valuations', "indicates how profitable a company is in relation to its total assets by dividing its net income by its total assets.")
+    'earnings_growth', 'higher','Growth', "Earnings growth rate is a key value that is needed when the Discounted cash flow model.",
+    'ebitda_margins', 'higher','Margins', "The EBITDA margin is calculated by dividing EBITDA by revenue.",
+    'gross_margins', 'higher', 'Margins',"Gross margin measures a company's gross profit compared to its revenues as a percentage.",
+    'operating_margins', 'higher','Margins', "The operating margin represents how efficiently a company is able to generate profit through its core operations.",
+    'profit_margins', 'higher','Margins', "Expressed as a percentage, profit margin indicates how many cents of profit has been generated for each dollar of sale.",
+    'revenue_growth', 'higher','Growth', "revenue growth is an increase in a company's sales in one year to the previous year. For an accurate picture of growth, investors should look at the growth of several quarters and how consistent it is.",
+    'return_on_assets', 'higher','Valuations', "indicates how profitable a company is in relation to its total assets by dividing its net income by its total assets.")
 
 
 
@@ -65,7 +65,7 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
   if(is.null(country)){
     region <- ""
   } else {
-    region <- stringr::str_c("AND country IN ('",stringr::str_c(country,collapse = "','"),"')")
+    region <- stringr::str_c("AND country_iso IN ('",stringr::str_c(country,collapse = "','"),"')")
   }
 
 
@@ -90,15 +90,15 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
 
   tic_ratios <- DBI::dbGetQuery(con, stringr::str_c("SELECT *
                             FROM (SELECT
-                            		CAST(regularMarketTime AS date) as date,
+                            		CAST(regular_market_time AS date) as date,
                                     ticker_yh,
-                                    longName AS name,",
+                                    long_name AS name,",
                             needed_ratios_sql,",
-                                    ROW_NUMBER() OVER (PARTITION BY ticker_yh ORDER BY regularMarketTime DESC) AS row_num
+                                    ROW_NUMBER() OVER (PARTITION BY ticker_yh ORDER BY regular_market_time DESC) AS row_num
                                   FROM fin_ticker_market_snapshot) as t
                             WHERE t.row_num = 1
                             AND ticker_yh IN ('",peer_sql,"')
-                            AND date >= (SELECT DATE_SUB(CAST(MAX(regularMarketTime) as DATE), INTERVAL 1 DAY) as max_date
+                            AND date >= (SELECT DATE_SUB(CAST(MAX(regular_market_time) as DATE), INTERVAL 2 DAY) as max_date
                                            FROM fin_ticker_market_snapshot)")) %>%
     dplyr::as_tibble() %>%
     dplyr::select(-.data$row_num)
@@ -109,13 +109,13 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
   tic_qtr_results_raw <- DBI::dbGetQuery(con, stringr::str_c("SELECT *
                                       FROM (
                                         SELECT
-                                            endDate as date,
+                                            end_date as date,
                                             ticker_yh,
-                                            totalRevenue,
-                                            accountsPayable,
-                                            capitalExpenditures,
-                                            researchDevelopment,
-                                            ROW_NUMBER() OVER (PARTITION BY ticker_yh ORDER BY endDate DESC) AS row_num
+                                            total_revenue,
+                                            accounts_payable,
+                                            capital_expenditures,
+                                            research_development,
+                                            ROW_NUMBER() OVER (PARTITION BY ticker_yh ORDER BY end_date DESC) AS row_num
                                         FROM fin_ticker_qtr_results_yh
                                       ) AS t
                                       WHERE t.row_num <= 2
@@ -130,9 +130,9 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
   tic_qtr_results <- tic_qtr_results_raw %>%
     dplyr::group_by(.data$ticker_yh) %>%
     dplyr::arrange(.data$ticker_yh,.data$date) %>%
-    dplyr::mutate(revenue_diff = (.data$totalRevenue-dplyr::lag(.data$totalRevenue))*4) %>%
+    dplyr::mutate(revenue_diff = (.data$total_revenue-dplyr::lag(.data$total_revenue))*4) %>%
     dplyr::ungroup() %>%
-    dplyr::select(date,ticker_yh,accountsPayable,capitalExpenditures,researchDevelopment,revenue_diff)
+    dplyr::select(date,ticker_yh,accounts_payable,capital_expenditures,research_development,revenue_diff)
 
 
 
@@ -142,7 +142,7 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
   # RULE OF 40
   if("profitMargins" %in% needed_ratios$ratios & "revenueGrowth" %in% needed_ratios$ratios){
     tic_ratios <- tic_ratios %>%
-      dplyr::mutate(rule_40 = profitMargins + revenueGrowth)
+      dplyr::mutate(rule_40 = profit_margins + revenue_growth)
 
     needed_ratios <- needed_ratios %>% tibble::add_row(
       ratios = 'rule_40',
@@ -161,16 +161,16 @@ rank_peer_ratio <- function(industry_level_prio = "industry_group", sector_prio 
         tic_qtr_results %>%
           dplyr::group_by(ticker_yh) %>%
           dplyr::summarise(min_date = min(date),
-                           accountsPayable = dplyr::first(accountsPayable),
-                           capitalExpenditures = dplyr::first(capitalExpenditures),
-                           researchDevelopment = dplyr::first(researchDevelopment),.groups = "drop") %>%
+                           accounts_payable = dplyr::first(accounts_payable),
+                           capital_expenditures = dplyr::first(capital_expenditures),
+                           research_development = dplyr::first(research_development),.groups = "drop") %>%
           dplyr::ungroup(),
         by = "ticker_yh") %>%
-        dplyr::select(date,ticker_yh,accountsPayable,capitalExpenditures,researchDevelopment,revenue_diff) %>%
+        dplyr::select(date,ticker_yh,accounts_payable,capital_expenditures,research_development,revenue_diff) %>%
         tidyr::drop_na(revenue_diff) %>%
-        dplyr::mutate(magic_number_accounts = revenue_diff/accountsPayable,
-                      magic_number_capexpends = revenue_diff/capitalExpenditures,
-                      magic_number_research_devs = revenue_diff/researchDevelopment) %>%
+        dplyr::mutate(magic_number_accounts = revenue_diff/accounts_payable,
+                      magic_number_capexpends = revenue_diff/capital_expenditures,
+                      magic_number_research_devs = revenue_diff/research_development) %>%
         dplyr::select(ticker_yh,magic_number_research_devs,magic_number_capexpends,magic_number_accounts),
       by = "ticker_yh")
 
