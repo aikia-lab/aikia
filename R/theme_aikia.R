@@ -147,7 +147,22 @@ aikia_palette_light <- function(){c("#61B7B7",
                    "#FFDB88",
                    "#FFBE88")}
 
-
+#' @name aikia_palette_eleven
+#' @rdname aikia_main
+#' @export
+#' @examples
+#' aikia_palette_eleven()
+aikia_palette_eleven <- function(){c("#1F525B",
+                   "#4964AB",
+                   "#707070",
+                   "#6893A1",
+                   "#976021",
+                   "#95D0DB",
+                   "#9BABD4",
+                   "#B8B8B8",
+                   "#A7C0C8",
+                   "#E5BB8A",
+                   "#1A444C")}
 # Scale Functions ----------------------------------------------------------
 
 #' @name scale_fill_aikia_four
