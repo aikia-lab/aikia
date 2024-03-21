@@ -3,6 +3,7 @@
 \name{scale_fill_aikia_four}
 \alias{scale_fill_aikia_four}
 \alias{scale_fill_aikia_eight}
+\alias{scale_fill_aikia_eleven}
 \alias{scale_color_aikia_four}
 \alias{scale_color_aikia_eight}
 \title{aikia scales}
@@ -10,6 +11,8 @@
 scale_fill_aikia_four()
 
 scale_fill_aikia_eight()
+
+scale_fill_aikia_eleven()
 
 scale_color_aikia_four()
 
@@ -25,11 +28,13 @@ Collection of aikia ggplot scale functions
 \dontrun{scale_fill_aikia_four()}
 
 \dontrun{scale_fill_aikia_eight()}
+\dontrun{scale_fill_aikia_eleven()}
 \dontrun{scale_color_aikia_four()}
 \dontrun{scale_color_aikia_eight()}
 }
 \seealso{
 Other aikia themes: 
+\code{\link{theme_aikia_light}()},
 \code{\link{theme_aikia}()}
 }
 \concept{aikia themes}

@@ -92,6 +92,99 @@ theme_aikia <- function(
 }
 
 
+#' aikia ggplot2 theme light
+#'
+#' @family aikia themes
+#' @param base_size double
+#' @param base_family character
+#' @param base_line_size double
+#' @param base_rect_size double
+#'
+#' @return function
+#' @export
+#' @importFrom ggplot2 %+replace%
+#'
+#' @examples
+#' library(ggplot2)
+#'
+#' ggplot(iris, aes(Sepal.Length)) +
+#' geom_histogram()+
+#' theme_aikia_light()
+theme_aikia_light <- function(
+    base_size = 11,
+    base_family = "",
+    base_line_size = base_size / 170,
+    base_rect_size = base_size / 170
+){
+  ggplot2::theme_minimal(
+    base_size = base_size,
+    base_family = base_family,
+    base_line_size = base_line_size
+  ) %+replace% ggplot2::theme(
+    plot.title = ggtext::element_markdown(
+      colour = aikia_main(),
+      #    face = "bold",
+      size = base_size + 24,
+      hjust = 0,
+      vjust = 2,
+      lineheight = 0.9
+    ),
+    plot.subtitle = ggtext::element_markdown(
+      colour = aikia_main_light(),
+      #    face = "bold",
+      size = base_size + 9,
+      hjust = 0,
+      vjust = 2,
+      lineheight = 0.9
+    ),
+    axis.title = ggplot2::element_text(
+      colour = aikia_main(),
+      face = "bold",
+      size = base_size + 3,
+      #hjust = 0,
+      lineheight = 0.9
+    ),
+    legend.text = ggplot2::element_text(
+      colour = aikia_main(),
+      face = "bold",
+      size = base_size - 1,
+      #hjust = 0,
+      lineheight = 0.9
+    ),
+    legend.title = ggplot2::element_text(
+      colour = aikia_main(),
+      face = "bold",
+      size = base_size + 3,
+      #hjust = 0,
+      lineheight = 0.9
+    ),
+    plot.caption = ggplot2::element_text(
+      colour = aikia_main(),
+      face = "bold",
+      size = base_size - 2,
+      hjust = 1
+    ),
+    # Facet Wrap Title
+    strip.text = ggplot2::element_text(
+      colour = aikia_main(),
+      face = "bold",
+      size = base_size - 2,
+      vjust = 1,
+      lineheight = 0.9,
+      margin = ggplot2::margin(4,0,4,0, unit = "pt")
+    ),
+    plot.background = ggplot2::element_blank(),
+    panel.background = ggplot2::element_rect(fill = NA),
+    panel.grid = ggplot2::element_blank(),
+    panel.border = ggplot2::element_blank(),
+    axis.text = ggplot2::element_text(colour = aikia_main()),
+    #axis.line = ggplot2::element_line(colour = main_color),
+    axis.line.x.top = ggplot2::element_blank(),
+    complete = TRUE)
+
+}
+
+
 #' @name aikia_main
 #' @title aikia colours
 #' @description Collection of aikia colors
@@ -186,6 +279,15 @@ scale_fill_aikia_four <- function(){
 #' \dontrun{scale_fill_aikia_eight()}
 scale_fill_aikia_eight <- function(){
   ggplot2::scale_fill_manual(values = aikia_palette_eight())
+}
+
+#' @name scale_fill_aikia_eleven
+#' @rdname scale_fill_aikia_four
+#' @export
+#' @examples
+#' \dontrun{scale_fill_aikia_eleven()}
+scale_fill_aikia_eleven <- function(){
+  ggplot2::scale_fill_manual(values = aikia_palette_eleven())
 }
 
 #' @name scale_color_aikia_four
