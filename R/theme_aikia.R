@@ -256,6 +256,30 @@ aikia_palette_eleven <- function(){c("#1F525B",
                    "#A7C0C8",
                    "#E5BB8A",
                    "#1A444C")}
+
+#' @name aikia_palette_fourteen
+#' @rdname aikia_main
+#' @export
+#' @examples
+#' aikia_palette_fourteen()
+aikia_palette_fourteen <- function(){c("#1F525B",
+                                     "#4964AB",
+                                     "#707070",
+                                     "#6893A1",
+                                     "#976021",
+                                     "#EE9B00",
+                                     "#CA6702",
+                                     "#9B2226",
+                                     "#95D0DB",
+                                     "#9BABD4",
+                                     "#B8B8B8",
+                                     "#A7C0C8",
+                                     "#E5BB8A",
+                                     "#1A444C")
+}
+
+
+
 # Scale Functions ----------------------------------------------------------
 
 #' @name scale_fill_aikia_four
@@ -289,6 +313,16 @@ scale_fill_aikia_eight <- function(){
 scale_fill_aikia_eleven <- function(){
   ggplot2::scale_fill_manual(values = aikia_palette_eleven())
 }
+
+#' @name scale_fill_aikia_fourteen
+#' @rdname scale_fill_aikia_four
+#' @export
+#' @examples
+#' \dontrun{scale_fill_aikia_eleven()}
+scale_fill_aikia_fourteen <- function(){
+  ggplot2::scale_fill_manual(values = aikia_palette_fourteen())
+}
+
 
 #' @name scale_color_aikia_four
 #' @rdname scale_fill_aikia_four

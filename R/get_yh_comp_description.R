@@ -13,7 +13,7 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
-#' get_yh_comp_description(c("AAPL","MSFT))
+#' get_yh_comp_description("AAPL")
 #' }
 get_yh_comp_description <- function(symbols = NULL, verbose = FALSE){
 

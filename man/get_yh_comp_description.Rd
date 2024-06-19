@@ -20,3 +20,8 @@ Get Company Descriptions from Yahoo Finance
 \details{
 Retrieve Company's profile and operating descriptions from the Yahoo Finance website.
 }
+\examples{
+\dontrun{
+get_yh_comp_description("AAPL")
+}
+}

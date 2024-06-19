@@ -8,6 +8,7 @@
 \alias{aikia_palette_eight}
 \alias{aikia_palette_light}
 \alias{aikia_palette_eleven}
+\alias{aikia_palette_fourteen}
 \title{aikia colours}
 \usage{
 aikia_main()
@@ -23,6 +24,8 @@ aikia_palette_eight()
 aikia_palette_light()
 
 aikia_palette_eleven()
+
+aikia_palette_fourteen()
 }
 \value{
 The functions return the hexcodes of colours
@@ -38,4 +41,5 @@ aikia_palette_main()
 aikia_palette_eight()
 aikia_palette_light()
 aikia_palette_eleven()
+aikia_palette_fourteen()
 }
