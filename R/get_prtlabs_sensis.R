@@ -2,10 +2,12 @@
 #' Get Ticker Sensis from Portfoliolab
 #'
 #' @param symbols Yahoo ticker symbol(s)
-#' @param allocation weight of ticker(s) in theroretical prt
+#' @param allocation weight of ticker(s) in theroretical prt (see details!)
+#' @param verbose if \code{TRUE} provides instant feedback
 #'
 #' @details
 #' Retrieve Ticker and Portfolio wise Sensis like Sharp Ratio, Sortino Ratio and Drawdowns from the Portfoliolabs.com website.
+#' If allocation is left empty, the weight for each ticker is set automatically to 100
 #'
 #' @return a tibble
 #' @export
@@ -15,12 +17,20 @@
 #' @examples \dontrun{
 #' get_prtlabs_sensis("AAPL",100)
 #' }
-get_prtlabs_sensis <- function(symbols = NULL, allocation = NULL){
+get_prtlabs_sensis <- function(symbols = NULL, allocation = NULL, verbose=FALSE){
 
-  if(is.null(symbols)|is.null(allocation)){
+  if(is.null(symbols)){
     cat("Check Input data\n")
     stop()
   }
+
+
+  if(is.null(symbols)){
+    if(verbose){cat("Allocation manuualy set to 100 for each ticker\n")}
+    allocation <- rep(100,length(symbols))
+  }
+
+
 
   # Prepare Headers
   headers <- c(

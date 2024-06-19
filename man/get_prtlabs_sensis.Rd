@@ -4,12 +4,14 @@
 \alias{get_prtlabs_sensis}
 \title{Get Ticker Sensis from Portfoliolab}
 \usage{
-get_prtlabs_sensis(symbols = NULL, allocation = NULL)
+get_prtlabs_sensis(symbols = NULL, allocation = NULL, verbose = FALSE)
 }
 \arguments{
 \item{symbols}{Yahoo ticker symbol(s)}
 
-\item{allocation}{weight of ticker(s) in theroretical prt}
+\item{allocation}{weight of ticker(s) in theroretical prt (see details!)}
+
+\item{verbose}{if \code{TRUE} provides instant feedback}
 }
 \value{
 a tibble
@@ -19,6 +21,7 @@ Get Ticker Sensis from Portfoliolab
 }
 \details{
 Retrieve Ticker and Portfolio wise Sensis like Sharp Ratio, Sortino Ratio and Drawdowns from the Portfoliolabs.com website.
+If allocation is left empty, the weight for each ticker is set automatically to 100
 }
 \examples{
 \dontrun{
