@@ -25,7 +25,7 @@ get_prtlabs_sensis <- function(symbols = NULL, allocation = NULL, verbose=FALSE)
   }
 
 
-  if(is.null(symbols)){
+  if(is.null(allocation)){
     if(verbose){cat("Allocation manuualy set to 100 for each ticker\n")}
     allocation <- rep(100,length(symbols))
   }
