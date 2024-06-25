@@ -20,7 +20,7 @@ a tibble
 Get Ticker Sensis from Portfoliolab
 }
 \details{
-Retrieve Ticker and Portfolio wise Sensis like Sharp Ratio, Sortino Ratio and Drawdowns from the Portfoliolabs.com website.
+Retrieve Ticker and Portfolio-wise Sensitivities like Sharp Ratio, Sortino Ratio and Drawdowns from the Portfoliolabs.com website.
 If allocation is left empty, the weight for each ticker is set automatically to 100
 }
 \examples{
