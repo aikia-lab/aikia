@@ -480,5 +480,46 @@ merge_list_of_df_w_same_columns_hf <- function(df_list) {
 
 
 
+find_in_db_tables <- function(search_term, exact = FALSE){
+
+  con <- aikia::connect_to_db()
+  result <- DBI::dbGetQuery(con,stringr::str_c("
+          SELECT ticker_yh as symbol,
+            name,
+            'ticker' as `table`
+          FROM fin_ticker_meta_data
+          WHERE ticker_yh LIKE CONCAT('%','",search_term,"','%')
+            OR ticker_bb LIKE CONCAT('%','",search_term,"','%')
+            OR ticker_fv LIKE CONCAT('%','",search_term,"','%')
+            OR name LIKE CONCAT('%','",search_term,"','%')
+          UNION ALL
+          SELECT series as symbol,
+            name,
+            'eco' as `table`
+            FROM eco_ts_meta_data
+            WHERE name LIKE CONCAT('%','",search_term,"','%')
+            OR name_short LIKE CONCAT('%','",search_term,"','%')
+            OR series LIKE CONCAT('%','",search_term,"','%')
+          UNION ALL
+          SELECT ticker_yh as symbol,
+            name,
+            'index' as `table`
+            FROM fin_index_meta_data
+            WHERE ticker_yh LIKE CONCAT('%','",search_term,"','%')
+            OR ticker_bb LIKE CONCAT('%','",search_term,"','%')
+            OR name LIKE CONCAT('%','",search_term,"','%')")) %>%
+    dplyr::as_tibble() %>%
+    dplyr::mutate_all(as.character)
+
+  DBI::dbDisconnect(con)
+
+  if(exact){
+    result <- result %>%
+      dplyr::filter(.data$symbol == search_term |
+                      .data$name == search_term )
+  }
+
+  return(result)
+}
 
 
