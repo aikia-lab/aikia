@@ -23,8 +23,8 @@ adjust_ticker_history_stocksplit <- function(check_1st = TRUE){
 
   # get all tickers with stock splits
   con <- aikia::connect_to_db()
-  sst <- DBI::dbReadTable(con,"fin_ticker_stocksplit") |>
-    dplyr::as_tibble() |>
+  sst <- DBI::dbReadTable(con,"fin_ticker_stocksplit") %>%
+    dplyr::as_tibble() %>%
     dplyr::filter(hist_adj == 0)
   DBI::dbDisconnect(con)
 
@@ -37,13 +37,13 @@ adjust_ticker_history_stocksplit <- function(check_1st = TRUE){
     FROM fin_ticker_history
     WHERE ticker_yh IN ('",sst_sql,"')
     ORDER BY date"
-  )) |> dplyr::as_tibble() |>
+  )) %>% dplyr::as_tibble() %>%
     dplyr::select(-uid,-retrieval_time)
   DBI::dbDisconnect(con)
 
 
   all_new <- all_hist %>%
-    dplyr::arrange(date) |>
+    dplyr::arrange(date) %>%
     dplyr::left_join(sst, by = c("ticker_yh")) %>%
     dplyr::mutate(
       # If the trade date is bevore the split date, adjust by the split ratio
@@ -57,11 +57,11 @@ adjust_ticker_history_stocksplit <- function(check_1st = TRUE){
   if(check_1st){
     print(sst)
 
-    check_diff <- dplyr::left_join(all_new, all_hist, by = c("date","ticker_yh")) |>
+    check_diff <- dplyr::left_join(all_new, all_hist, by = c("date","ticker_yh")) %>%
       dplyr::mutate(retX = adjusted.x / dplyr::lag(adjusted.x)-1,
-                    retY = adjusted.y / dplyr::lag(adjusted.y)-1, .by = ticker_yh) |>
-      dplyr::mutate(diff = retX - retY) |>
-      dplyr::select(date, ticker_yh, diff,retX,retY) |>
+                    retY = adjusted.y / dplyr::lag(adjusted.y)-1, .by = ticker_yh) %>%
+      dplyr::mutate(diff = retX - retY) %>%
+      dplyr::select(date, ticker_yh, diff,retX,retY) %>%
       dplyr::arrange(desc(diff))
     cat(script_logger("\ncheck highest diviations:\n"))
     print(check_diff)
@@ -74,8 +74,8 @@ adjust_ticker_history_stocksplit <- function(check_1st = TRUE){
       for(tic in sst$ticker_yh){
 
         cat(script_logger("inserting new history for"),tic,"\n")
-        new_hist <- all_new |>
-          dplyr::filter(ticker_yh == tic) |>
+        new_hist <- all_new %>%
+          dplyr::filter(ticker_yh == tic) %>%
           dplyr::select(date, ticker_yh,open,close, high, low, adjusted, volume)
 
         con <- aikia::connect_to_db()
@@ -136,8 +136,8 @@ adjust_ticker_history_stocksplit <- function(check_1st = TRUE){
       DBI::dbDisconnect(mydb)
 
       cat(script_logger("inserting new history for"),tic,"\n")
-      new_hist <- all_new |>
-        dplyr::filter(ticker_yh == tic) |>
+      new_hist <- all_new %>%
+        dplyr::filter(ticker_yh == tic) %>%
         dplyr::select(date, ticker_yh,open,close, high, low, adjusted, volume)
 
       con <- aikia::connect_to_db()
