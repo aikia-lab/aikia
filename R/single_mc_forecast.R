@@ -106,9 +106,9 @@ single_mc_forecast <- function(s_ticker,
 
   if(combine_ts){
     new_ts <- rbind(
-      single_ticker |> dplyr::select(date,symbol,price) |> dplyr::mutate(percentile_up=0, percentile_down=0),
-      new_ts |> dplyr::rename(price = mean)) |>
-      dplyr::arrange(desc(date)) |>
+      single_ticker %>% dplyr::select(date,symbol,price) %>% dplyr::mutate(percentile_up=0, percentile_down=0),
+      new_ts %>% dplyr::rename(price = mean)) %>%
+      dplyr::arrange(desc(date)) %>%
       dplyr::distinct(date,.keep_all = T)
   }
 
